@@ -229,7 +229,12 @@ private:
 		maxSizeBookName = loan->bookName.size();
 	}
 
-	if (maxSizeBookName > MAX_SIZE_BOOK_NAME)
+	/* Manage empty names */
+	if (maxSizeBookName == 0)
+	    maxSizeBookName = sizeof("No name ")-1;
+	else if (maxSizeBookName < 4)
+	    maxSizeBookName = 4;
+	else if (maxSizeBookName > MAX_SIZE_BOOK_NAME)
 	    maxSizeBookName = MAX_SIZE_BOOK_NAME;
 	else if ((maxSizeBookName % 2))
 	    maxSizeBookName++;
@@ -276,7 +281,9 @@ private:
 	    std::cout << kv.first;
 	    std::cout << "    ";
 
-	    if (loan->bookName.size() > MAX_SIZE_BOOK_NAME)
+	    if (loan->bookName.size() == 0)
+		bookName = std::string("No name ");
+	    else if (loan->bookName.size() > MAX_SIZE_BOOK_NAME)
 		bookName = std::string(loan->bookName.c_str(), MAX_SIZE_BOOK_NAME);
 	    else
 		bookName = loan->bookName;
