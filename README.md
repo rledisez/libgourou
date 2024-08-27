@@ -150,3 +150,16 @@ Special thanks
   * _Jens_ for all test samples and utils testing
   * _Milian_ for debug & code
   * _Berwyn H_ for all test samples, feedbacks, patches and kind donation
+
+
+Donation
+--------
+
+https://www.paypal.com/donate/?hosted_button_id=JD3U6XMZCPHKN
+
+
+Donators
+--------
+
+  * _Berwyn H_
+  * _bwitt_
