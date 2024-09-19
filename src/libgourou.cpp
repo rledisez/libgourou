@@ -859,14 +859,21 @@ namespace gourou
     std::string DRMProcessor::getDefaultAdeptDir(void)
     {
 #ifndef DEFAULT_ADEPT_DIR
-	const char* user = getenv("USER");
+    const char* home = getenv("HOME");
+    
+    if (home)
+        return home + std::string("/.config/adept/");
+    else
+    {
+	    const char* user = getenv("USER");
 	
-	if (user && user[0])
-	{
-	    return std::string("/home/") + user + std::string("/.config/adept/");
-	}
-	else
-	    return LOCAL_ADEPT_DIR;
+	    if (user && user[0])
+	    {
+	        return std::string("/home/") + user + std::string("/.config/adept/");
+	    }
+	    else
+	        return LOCAL_ADEPT_DIR;
+    }
 #else
 	return DEFAULT_ADEPT_DIR "/";
 #endif
