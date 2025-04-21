@@ -46,12 +46,14 @@ _internals_:
 For utils:
 
   * libcurl
-  * OpenSSL
+  * openssl
   * libzip
   * libpugixml
 
 
-Internal libraries are automatically fetched and statically compiled during the first run.
+External & utils dependencies has to be installed by your package manager (_apt_ for example).
+Use _-dev_ flavours to get needed headers.
+Internal libraries are automatically fetched and statically compiled during the first compilation.
 When you update libgourou's repository, **don't forget to update internal libraries** with:
 
     make update_lib
