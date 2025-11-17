@@ -126,6 +126,12 @@ To return a loaned book:
 You can get utils full options description with -h or --help switch
 
 
+Binary packages
+---------------
+
+Compiled version (and AppImage) of libgourou and utils are available in [Release page](https://forge.soutade.fr/soutade/libgourou/releases)
+
+
 Docker
 ------
 
