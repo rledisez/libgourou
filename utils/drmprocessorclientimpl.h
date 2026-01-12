@@ -130,6 +130,8 @@ private:
 
     void padWithPKCS1(unsigned char* out, unsigned int outLength,
 		      const unsigned char* in, unsigned int inLength);
+    void padWithPKCS1Type2(unsigned char* out, unsigned int outLength,
+		      const unsigned char* in, unsigned int inLength);
     
 #if OPENSSL_VERSION_MAJOR >= 3
     OSSL_PROVIDER *legacy, *deflt;

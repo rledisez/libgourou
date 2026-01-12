@@ -49,17 +49,27 @@
 #include <libgourou_common.h>
 #include "drmprocessorclientimpl.h"
 
+static int error_cb(const char *str, size_t len, void *u)
+{
+    std::cout << str << std::endl;
+    return 0;
+}
+
 DRMProcessorClientImpl::DRMProcessorClientImpl():
     legacy(0), deflt(0)
 {
 #if OPENSSL_VERSION_MAJOR >= 3
     legacy = OSSL_PROVIDER_load(NULL, "legacy");
     if (!legacy)
+    {
+	ERR_print_errors_cb(error_cb, NULL);
 	EXCEPTION(gourou::CLIENT_OSSL_ERROR, "Error, OpenSSL legacy provider not available");
+    }
 
     deflt = OSSL_PROVIDER_load(NULL, "default");
     if (!deflt)
 	EXCEPTION(gourou::CLIENT_OSSL_ERROR, "Error, OpenSSL default provider not available");
+    OSSL_PROVIDER_load(NULL, "base");
 #endif
 
 #ifdef WIN32
@@ -333,11 +343,39 @@ void DRMProcessorClientImpl::padWithPKCS1(unsigned char* out, unsigned int outLe
           0x00 0x01 0xff * n 0x00 dataIn
     */
     
-    memset(out, 0xFF, outLength);
+    memset(out, 0xFF, outLength - inLength - 1);
     
     out[0] = 0x0;
     out[1] = 0x1;
     out[outLength - inLength - 1] = 0x00;
+    
+    memcpy(&out[outLength - inLength], in, inLength);
+}
+
+void DRMProcessorClientImpl::padWithPKCS1Type2(unsigned char* out, unsigned int outLength,
+					  const unsigned char* in, unsigned int inLength)
+{
+    if (outLength < (inLength + 3))
+	EXCEPTION(gourou::CLIENT_RSA_ERROR, "Not enough space for PKCS1 padding");
+    
+    /*
+      PKCS1v5 type 2 Padding is :
+          0x00 0x02 0xXX * n 0x00 dataIn
+	  XX is random non zero data
+    */
+
+    RAND_bytes(&out[2], outLength - inLength - 1);
+
+    for(unsigned int i=2; i<outLength - inLength - 1; i++)
+    {
+	while (out[i] == 0)
+	    RAND_bytes(&out[i], 1);
+    }
+    
+    out[0] = 0x0;
+    out[1] = 0x2;
+    out[outLength - inLength - 1] = 0x00;
+    
     memcpy(&out[outLength - inLength], in, inLength);
 }
 
@@ -429,33 +467,45 @@ void DRMProcessorClientImpl::RSAPublicEncrypt(const unsigned char* RSAKey, unsig
 					      unsigned char* res)
 {
     size_t outlen;
-
+    unsigned char* tmp;
+    
     X509 * x509 = d2i_X509(0, &RSAKey, RSAKeyLength);
     if (!x509)
 	EXCEPTION(gourou::CLIENT_INVALID_CERTIFICATE, "Invalid certificate");
 	
     EVP_PKEY_CTX *ctx;
-    EVP_PKEY * evpKey = X509_get_pubkey(x509);
+    EVP_PKEY * pkey = X509_get_pubkey(x509);
 
-    if (!evpKey)
+    if (!pkey)
 	EXCEPTION(gourou::CLIENT_NO_PUB_KEY, "No public key in certificate");
 
-    ctx = EVP_PKEY_CTX_new(evpKey, NULL);
+    ctx = EVP_PKEY_CTX_new(pkey, NULL);
 
     if (EVP_PKEY_encrypt_init(ctx) <= 0)
 	EXCEPTION(gourou::CLIENT_RSA_ERROR, ERR_error_string(ERR_get_error(), NULL));
 
-    if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING) <= 0)
-	EXCEPTION(gourou::CLIENT_RSA_ERROR, ERR_error_string(ERR_get_error(), NULL));
+    if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_NO_PADDING) <= 0)
+    	EXCEPTION(gourou::CLIENT_RSA_ERROR, ERR_error_string(ERR_get_error(), NULL));
 
-    int ret = EVP_PKEY_encrypt(ctx, res, &outlen, data, dataLength);
+    outlen = EVP_PKEY_get_size(pkey);
+    
+    tmp = (unsigned char*)malloc(outlen);
+
+    /*
+      PKCS1 functions are no more exported.
+      Some OpenSSL libraries still use type 1
+    */
+    padWithPKCS1Type2(tmp, outlen, data, dataLength);
+    
+    int ret = EVP_PKEY_encrypt(ctx, res, &outlen, tmp, outlen);
 
     EVP_PKEY_CTX_free(ctx);
+    free(tmp);
     
+    EVP_PKEY_free(pkey);
+
     if (ret < 0)
 	EXCEPTION(gourou::CLIENT_RSA_ERROR, ERR_error_string(ERR_get_error(), NULL));
-
-    EVP_PKEY_free(evpKey);
 }
 
 void* DRMProcessorClientImpl::generateRSAKey(int keyLengthBits)
@@ -469,7 +519,6 @@ void* DRMProcessorClientImpl::generateRSAKey(int keyLengthBits)
     EVP_PKEY_keygen_init(ctx);
 
     EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, keyLengthBits);
-    EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING);
     EVP_PKEY_CTX_set1_rsa_keygen_pubexp(ctx, bn);
     EVP_PKEY_keygen(ctx, &key);
 
