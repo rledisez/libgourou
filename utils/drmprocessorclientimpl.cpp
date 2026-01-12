@@ -78,7 +78,13 @@ DRMProcessorClientImpl::DRMProcessorClientImpl():
     strcpy(cookiejar, "/tmp/libgourou_cookie_jar_XXXXXX");
 #endif
     
-    mkstemp(cookiejar);
+    int fd = mkstemp(cookiejar);
+    if (fd >= 0)
+	close(fd);
+    else
+    {
+	EXCEPTION(gourou::CLIENT_FILE_ERROR, "mkstemp error");
+    }
 }
 
 DRMProcessorClientImpl::~DRMProcessorClientImpl()
