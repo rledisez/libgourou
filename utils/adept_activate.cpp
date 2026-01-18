@@ -4,16 +4,16 @@
   All rights reserved.
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
+
   * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+  notice, this list of conditions and the following disclaimer.
   * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
   * Neither the name of the copyright holder nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
-  
+  names of its contributors may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -64,69 +64,69 @@ static int getch() {
 
 static std::string getpass(const char *prompt, bool show_asterisk=false)
 {
-  const char BACKSPACE=127;
-  const char RETURN=10;
+    const char BACKSPACE=127;
+    const char RETURN=10;
 
-  std::string password;
-  unsigned char ch=0;
+    std::string password;
+    unsigned char ch=0;
 
-  std::cout <<prompt;
+    std::cout <<prompt;
 
-  while((ch=getch())!= RETURN)
+    while((ch=getch())!= RETURN)
     {
-	if(ch==BACKSPACE)
-         {
+        if(ch==BACKSPACE)
+        {
             if(password.length()!=0)
-              {
-                 if(show_asterisk)
-                 std::cout <<"\b \b";
-                 password.resize(password.length()-1);
-              }
-         }
-       else
-         {
-             password+=ch;
-             if(show_asterisk)
-                 std::cout <<'*';
-         }
+            {
+                if(show_asterisk)
+                    std::cout <<"\b \b";
+                password.resize(password.length()-1);
+            }
+        }
+        else
+        {
+            password+=ch;
+            if(show_asterisk)
+                std::cout <<'*';
+        }
     }
-  std::cout <<std::endl;
-  return password;
+    std::cout <<std::endl;
+    return password;
 }
 
 
 class ADEPTActivate
 {
-public:  
+public:
 
     int run()
     {
-	int ret = 0;
-	try
-	{
-	    DRMProcessorClientImpl client;
-	    gourou::DRMProcessor* processor = gourou::DRMProcessor::createDRMProcessor(
-		&client, randomSerial, outputDir, hobbesVersion);
+        int ret = 0;
+        try
+        {
+            DRMProcessorClientImpl client;
+            gourou::DRMProcessor* processor = gourou::DRMProcessor::createDRMProcessor(
+                &client, randomSerial, outputDir, hobbesVersion);
 
-	    processor->signIn(username, password);
-	    processor->activateDevice();
+            processor->signIn(username, password);
+            processor->activateDevice();
 
-	    std::cout << username << " fully signed and device activated in " << outputDir << std::endl;
-	} catch(std::exception& e)
-	{
-	    std::cout << e.what() << std::endl;
-	    ret = 1;
-	}
+            std::cout << username << " fully signed and device activated in " << outputDir << std::endl;
+        } catch(std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+            ret = 1;
+        }
 
-	return ret;
+        return ret;
     }
-};	      
+};    
 
 
 static void usage(const char* cmd)
 {
     std::cout << basename((char*)cmd) << " create new device files used by ADEPT DRM" << std::endl << std::endl;
-    
+
     std::cout << "Usage: " << basename((char*)cmd) << " OPTIONS" << std::endl << std::endl;
 
     std::cout << "Global Options:" << std::endl;
@@ -160,129 +160,129 @@ int main(int argc, char** argv)
     const char* _outputDir = outputDir;
     int verbose = gourou::DRMProcessor::getLogLevel();
     bool anonymous = false;
-    
+
     while (1) {
-	int option_index = 0;
-	static struct option long_options[] = {
-	    {"anonymous",     no_argument      , 0,  'a' },
-	    {"username",      required_argument, 0,  'u' },
-	    {"password",      required_argument, 0,  'p' },
-	    {"output-dir",    required_argument, 0,  'O' },
-	    {"hobbes-version",required_argument, 0,  'H' },
-	    {"random-serial", no_argument,       0,  'r' },
-	    {"verbose",       no_argument,       0,  'v' },
-	    {"version",       no_argument,       0,  'V' },
-	    {"help",          no_argument,       0,  'h' },
-	    {0,               0,                 0,  0 }
-	};
+        int option_index = 0;
+        static struct option long_options[] = {
+            {"anonymous",     no_argument      , 0,  'a' },
+            {"username",      required_argument, 0,  'u' },
+            {"password",      required_argument, 0,  'p' },
+            {"output-dir",    required_argument, 0,  'O' },
+            {"hobbes-version",required_argument, 0,  'H' },
+            {"random-serial", no_argument,       0,  'r' },
+            {"verbose",       no_argument,       0,  'v' },
+            {"version",       no_argument,       0,  'V' },
+            {"help",          no_argument,       0,  'h' },
+            {0,               0,                 0,  0 }
+        };
 
-	c = getopt_long(argc, argv, "au:p:O:H:rvVh",
+        c = getopt_long(argc, argv, "au:p:O:H:rvVh",
                         long_options, &option_index);
-	if (c == -1)
-	    break;
+        if (c == -1)
+            break;
 
-	switch (c) {
-	case 'a':
-	    anonymous = true;
-	    break;
-	case 'u':
-	    username = optarg;
-	    break;
-	case 'p':
-	    password = optarg;
-	    break;
-	case 'O':
-	    _outputDir = optarg;
-	    break;
-	case 'H':
-	    hobbesVersion = optarg;
-	    break;
-	case 'v':
-	    verbose++;
-	    break;
-	case 'V':
-	    version();
-	    return 0;
-	case 'h':
-	    usage(argv[0]);
-	    return 0;
-	case 'r':
-	    randomSerial = true;
-	    break;
-	default:
-	    usage(argv[0]);
-	    return -1;
-	}
+        switch (c) {
+        case 'a':
+            anonymous = true;
+            break;
+        case 'u':
+            username = optarg;
+            break;
+        case 'p':
+            password = optarg;
+            break;
+        case 'O':
+            _outputDir = optarg;
+            break;
+        case 'H':
+            hobbesVersion = optarg;
+            break;
+        case 'v':
+            verbose++;
+            break;
+        case 'V':
+            version();
+            return 0;
+        case 'h':
+            usage(argv[0]);
+            return 0;
+        case 'r':
+            randomSerial = true;
+            break;
+        default:
+            usage(argv[0]);
+            return -1;
+        }
     }
-   
+
     gourou::DRMProcessor::setLogLevel(verbose);
 
     if ((!username && !anonymous) ||
-	(username && anonymous))
+        (username && anonymous))
     {
-	usage(argv[0]);
-	return -1;
+        usage(argv[0]);
+        return -1;
     }
 
     if (anonymous)
     {
-	username = "anonymous";
-	password = "";
+        username = "anonymous";
+        password = "";
     }
-    
+
     if (!_outputDir || _outputDir[0] == 0)
     {
-	outputDir = strdup(gourou::DRMProcessor::getDefaultAdeptDir().c_str());
+        outputDir = strdup(gourou::DRMProcessor::getDefaultAdeptDir().c_str());
     }
     else
     {
-	// Relative path
-	if (_outputDir[0] == '.' || _outputDir[0] != '/')
-	{
-	    // realpath doesn't works if file/dir doesn't exists
-	    if (fileExists(_outputDir))
-		outputDir = strdup(realpath(_outputDir, 0));
-	    else
-		outputDir = strdup(abspath(_outputDir));
-	}
-	else
-	    outputDir = strdup(_outputDir);
+        // Relative path
+        if (_outputDir[0] == '.' || _outputDir[0] != '/')
+        {
+            // realpath doesn't works if file/dir doesn't exists
+            if (fileExists(_outputDir))
+                outputDir = strdup(realpath(_outputDir, 0));
+            else
+                outputDir = strdup(abspath(_outputDir));
+        }
+        else
+            outputDir = strdup(_outputDir);
     }
 
     std::string pass;
     if (fileExists(outputDir))
     {
-	int key;
-	
-	while (true)
-	{
-	    std::cout << "!! Warning !! : " << outputDir << " already exists." << std::endl;
-	    std::cout << "All your data will be overwrite. Would you like to continue ? [y/N] " << std::flush ;
-	    key = getchar();
-	    if (key == 'n' || key == 'N' || key == '\n' || key == '\r')
-		goto end;
-	    if (key == 'y' || key == 'Y')
-		break;
-	}
+        int key;
+    
+        while (true)
+        {
+            std::cout << "!! Warning !! : " << outputDir << " already exists." << std::endl;
+            std::cout << "All your data will be overwrite. Would you like to continue ? [y/N] " << std::flush ;
+            key = getchar();
+            if (key == 'n' || key == 'N' || key == '\n' || key == '\r')
+                goto end;
+            if (key == 'y' || key == 'Y')
+                break;
+        }
 
-	// Clean STDIN buf
-	while ((key = getchar()) != '\n')
-	    ;
+        // Clean STDIN buf
+        while ((key = getchar()) != '\n')
+            ;
     }
 
     if (!password)
     {
-	char prompt[128];
-	std::snprintf(prompt, sizeof(prompt), "Enter password for <%s> : ", username);
-	pass = getpass((const char*)prompt, false);
-	password = pass.c_str();
+        char prompt[128];
+        std::snprintf(prompt, sizeof(prompt), "Enter password for <%s> : ", username);
+        pass = getpass((const char*)prompt, false);
+        password = pass.c_str();
     }
-        
+
     ADEPTActivate activate;
 
     ret = activate.run();
 
-end:    
+end:
     free((void*)outputDir);
     return ret;
 }

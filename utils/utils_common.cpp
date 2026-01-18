@@ -4,16 +4,16 @@
   All rights reserved.
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
+
   * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+  notice, this list of conditions and the following disclaimer.
   * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
   * Neither the name of the copyright holder nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
-  
+  names of its contributors may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -62,31 +62,31 @@ bool fileExists(const char* filename)
 const char* findFile(const char* filename, bool inDefaultDirs)
 {
     std::string path;
-    
+
     const char* adeptDir = getenv("ADEPT_DIR");
     if (adeptDir && adeptDir[0])
     {
-	path = adeptDir + std::string("/") + filename;
-	if (fileExists(path.c_str()))
-	    return strdup(path.c_str());
+        path = adeptDir + std::string("/") + filename;
+        if (fileExists(path.c_str()))
+            return strdup(path.c_str());
     }
 
     path = gourou::DRMProcessor::getDefaultAdeptDir() + filename;
     if (fileExists(path.c_str()))
-	return strdup(path.c_str());
+        return strdup(path.c_str());
 
     if (fileExists(filename))
-	return strdup(filename);
+        return strdup(filename);
 
     if (!inDefaultDirs) return 0;
-    
+
     for (int i=0; i<(int)ARRAY_SIZE(defaultDirs); i++)
     {
-	path = std::string(defaultDirs[i]) + filename;
-	if (fileExists(path.c_str()))
-	    return strdup(path.c_str());
+        path = std::string(defaultDirs[i]) + filename;
+        if (fileExists(path.c_str()))
+            return strdup(path.c_str());
     }
-    
+
     return 0;
 }
 
@@ -118,35 +118,35 @@ void fileCopy(const char* in, const char* out)
     fdIn = open(in, O_RDONLY);
 
     if (!fdIn)
-	EXCEPTION(gourou::CLIENT_FILE_ERROR, "Unable to open " << in);
-    
+        EXCEPTION(gourou::CLIENT_FILE_ERROR, "Unable to open " << in);
+
     fdOut = gourou::createNewFile(out);
-    
+
     if (!fdOut)
     {
-	close (fdIn);
-	EXCEPTION(gourou::CLIENT_FILE_ERROR, "Unable to open " << out);
+        close (fdIn);
+        EXCEPTION(gourou::CLIENT_FILE_ERROR, "Unable to open " << out);
     }
 
     while (true)
     {
-	ret = ::read(fdIn, buffer, sizeof(buffer));
-	if (ret <= 0)
-	    break;
-	do
-	{
-	    _buffer = buffer;
-	    ret2 = ::write(fdOut, _buffer, ret);
-	    if (ret2 >= 0)
-	    {
-		ret -= ret2;
-		_buffer += ret2;
-	    }
-	    else
-	    {
-		EXCEPTION(gourou::CLIENT_FILE_ERROR, "Error writing " << out);
-	    }
-	} while (ret);
+        ret = ::read(fdIn, buffer, sizeof(buffer));
+        if (ret <= 0)
+            break;
+        do
+        {
+            _buffer = buffer;
+            ret2 = ::write(fdOut, _buffer, ret);
+            if (ret2 >= 0)
+            {
+                ret -= ret2;
+                _buffer += ret2;
+            }
+            else
+            {
+                EXCEPTION(gourou::CLIENT_FILE_ERROR, "Error writing " << out);
+            }
+        } while (ret);
     }
 
     close (fdIn);

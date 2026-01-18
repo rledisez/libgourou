@@ -6,9 +6,10 @@ TARGETS=$(TARGET_BINARIES) launcher
 
 MAN_PAGES=acsmdownloader adept_activate adept_remove adept_loan_mgt
 
-CXXFLAGS=-Wall -fPIC -I$(ROOT)/include
+CXXFLAGS=-Wall -fPIC -I$(ROOT)/include -fdata-sections -ffunction-sections
 
 STATIC_DEP=
+# LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -L$(ROOT) -lcrypto -lzip -lz -lcurl -lpugixml
 
 ifneq ($(STATIC_UTILS),)
@@ -31,7 +32,7 @@ COMMON_LIB  = utils.a
 all: $(TARGETS)
 
 ${COMMON_LIB}: $(COMMON_DEPS)
-	$(CXX) $(CXXFLAGS) $(COMMON_DEPS) $(LDFLAGS) -c
+	$(CXX) $(CXXFLAGS) $(COMMON_DEPS) -c
 	$(AR) crs $@ $(COMMON_OBJECTS)
 
 %: %.cpp $(COMMON_LIB) $(STATIC_DEP)

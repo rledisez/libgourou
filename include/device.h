@@ -30,54 +30,54 @@ namespace gourou
     class Device
     {
     public:
-	static const int DEVICE_KEY_SIZE   = 16;
-	static const int DEVICE_SERIAL_LEN = 10;
+        static const int DEVICE_KEY_SIZE   = 16;
+        static const int DEVICE_SERIAL_LEN = 10;
 
-	/**
-	 * @brief Main Device constructor
-	 *
-	 * @param processor      Instance of DRMProcessor
-	 * @param deviceFile     Path of device.xml
-	 * @param deviceKeyFile  Path of devicesalt
-	 */
-	Device(DRMProcessor* processor, const std::string& deviceFile, const std::string& deviceKeyFile);
+        /**
+         * @brief Main Device constructor
+         *
+         * @param processor      Instance of DRMProcessor
+         * @param deviceFile     Path of device.xml
+         * @param deviceKeyFile  Path of devicesalt
+         */
+        Device(DRMProcessor* processor, const std::string& deviceFile, const std::string& deviceKeyFile);
 
-	/**
-	 * @brief Return value of devicesalt file (DEVICE_KEY_SIZE len)
-	 */
-	const unsigned char* getDeviceKey();
+        /**
+         * @brief Return value of devicesalt file (DEVICE_KEY_SIZE len)
+         */
+        const unsigned char* getDeviceKey();
 
-	/**
-	 * @brief Get one value of device.xml (deviceClass, deviceSerial, deviceName, deviceType, hobbes, clientOS, clientLocale)
-	 */
-	std::string getProperty(const std::string& property, const std::string& _default=std::string(""));
-	std::string operator[](const std::string& property);
+        /**
+         * @brief Get one value of device.xml (deviceClass, deviceSerial, deviceName, deviceType, hobbes, clientOS, clientLocale)
+         */
+        std::string getProperty(const std::string& property, const std::string& _default=std::string(""));
+        std::string operator[](const std::string& property);
 
-	/**
-	 * @brief Create device.xml and devicesalt files when they did not exists
-	 *
-	 * @param processor      Instance of DRMProcessor
-	 * @param dirName        Directory where to put files (.adept)
-	 * @param hobbes         Hobbes (client version) to set
-	 * @param randomSerial   Create a random serial (new device each time) or not (serial computed from machine specs)
-	 */
-	static Device* createDevice(DRMProcessor* processor, const std::string& dirName, const std::string& hobbes, bool randomSerial);
-	
+        /**
+         * @brief Create device.xml and devicesalt files when they did not exists
+         *
+         * @param processor      Instance of DRMProcessor
+         * @param dirName        Directory where to put files (.adept)
+         * @param hobbes         Hobbes (client version) to set
+         * @param randomSerial   Create a random serial (new device each time) or not (serial computed from machine specs)
+         */
+        static Device* createDevice(DRMProcessor* processor, const std::string& dirName, const std::string& hobbes, bool randomSerial);
+
     private:
-	DRMProcessor* processor;
+        DRMProcessor* processor;
         std::string deviceFile;
         std::string deviceKeyFile;
-	unsigned char deviceKey[DEVICE_KEY_SIZE];
-	std::map<std::string, std::string> properties;
+        unsigned char deviceKey[DEVICE_KEY_SIZE];
+        std::map<std::string, std::string> properties;
 
-	Device(DRMProcessor* processor);
-	
-	std::string makeFingerprint(const std::string& serial);
-	std::string makeSerial(bool random);
-	void parseDeviceFile();
-	void parseDeviceKeyFile();
-	void createDeviceFile(const std::string& hobbes, bool randomSerial);
-	void createDeviceKeyFile();
+        Device(DRMProcessor* processor);
+
+        std::string makeFingerprint(const std::string& serial);
+        std::string makeSerial(bool random);
+        void parseDeviceFile();
+        void parseDeviceKeyFile();
+        void createDeviceFile(const std::string& hobbes, bool randomSerial);
+        void createDeviceKeyFile();
     };
 }
 

@@ -24,11 +24,11 @@
 
 namespace gourou {
     enum GOUROU_LOG_LEVEL {
-	LG_LOG_ERROR,
-	LG_LOG_WARN,
-	LG_LOG_INFO,
-	LG_LOG_DEBUG,
-	LG_LOG_TRACE
+        LG_LOG_ERROR,
+        LG_LOG_WARN,
+        LG_LOG_INFO,
+        LG_LOG_DEBUG,
+        LG_LOG_TRACE
     };
 
     extern GOUROU_LOG_LEVEL logLevel;

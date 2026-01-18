@@ -32,21 +32,21 @@ namespace gourou
     class LoanToken
     {
     public:
-	/**
-	 * @brief Main constructor. Not to be called by user
-	 *
-	 * @param doc   Fulfill reply
-	 */
-	LoanToken(pugi::xml_document& doc);
+        /**
+         * @brief Main constructor. Not to be called by user
+         *
+         * @param doc   Fulfill reply
+         */
+        LoanToken(pugi::xml_document& doc);
 
-	/**
-	 * @brief Get a property (id, operatorURL, validity)
-	 */
-	std::string getProperty(const std::string& property, const std::string& _default=std::string(""));
-	std::string operator[](const std::string& property);
+        /**
+         * @brief Get a property (id, operatorURL, validity)
+         */
+        std::string getProperty(const std::string& property, const std::string& _default=std::string(""));
+        std::string operator[](const std::string& property);
 
     private:
-	std::map<std::string, std::string> properties;
+        std::map<std::string, std::string> properties;
     };
 }
 

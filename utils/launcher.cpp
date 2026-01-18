@@ -24,17 +24,17 @@ int main(int argc, char** argv)
     fullPath = std::string(mountPoint) + util;
 
     if (std::string(util) == "launcher" || !fileExists(fullPath.c_str()))
-	fullPath = std::string(mountPoint) + DEFAULT_UTIL;
+        fullPath = std::string(mountPoint) + DEFAULT_UTIL;
 
     free(argv0);
-    
+
     argv[0] = strdup(fullPath.c_str());
 
     if (execvp(argv[0], argv))
-	std::cout << "Unable to launch '" << argv[0] << "'" << std::endl;
+        std::cout << "Unable to launch '" << argv[0] << "'" << std::endl;
 
     /* Should not happens */
     free(argv[0]);
-    
+
     return 0;
 }

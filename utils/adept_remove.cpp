@@ -4,16 +4,16 @@
   All rights reserved.
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
-  
+
   * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+  notice, this list of conditions and the following disclaimer.
   * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
   * Neither the name of the copyright holder nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
-  
+  names of its contributors may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
   EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -51,13 +51,13 @@ static unsigned       encryptionKeySize  = 0;
 static inline unsigned char htoi(unsigned char c)
 {
     if (c >= '0' && c <= '9')
-	c -= '0';
+        c -= '0';
     else if (c >= 'a' && c <= 'f')
-	c -= 'a' - 10;
+        c -= 'a' - 10;
     else if (c >= 'A' && c <= 'F')
-	c -= 'A' - 10;
+        c -= 'A' - 10;
     else
-	EXCEPTION(gourou::USER_INVALID_INPUT, "Invalid character " << c << " in encryption key");
+        EXCEPTION(gourou::USER_INVALID_INPUT, "Invalid character " << c << " in encryption key");
 
     return c;
 }
@@ -70,82 +70,82 @@ static inline bool endsWith(const std::string& s, const std::string& suffix)
 class ADEPTRemove
 {
 public:
-   
+
     int run()
     {
-	int ret = 0;
-	try
-	{
-	    gourou::DRMProcessor::ITEM_TYPE type;
-	    DRMProcessorClientImpl client;
-	    gourou::DRMProcessor processor(&client, deviceFile, activationFile, devicekeyFile);
-	    
-	    std::string filename;
-	    if (!outputFile)
-		filename = std::string(inputFile);
-	    else
-		filename = outputFile;
-	    
-	    if (outputDir)
-	    {
-		if (!fileExists(outputDir))
-		    mkpath(outputDir);
+        int ret = 0;
+        try
+        {
+            gourou::DRMProcessor::ITEM_TYPE type;
+            DRMProcessorClientImpl client;
+            gourou::DRMProcessor processor(&client, deviceFile, activationFile, devicekeyFile);
+    
+            std::string filename;
+            if (!outputFile)
+                filename = std::string(inputFile);
+            else
+                filename = outputFile;
+    
+            if (outputDir)
+            {
+                if (!fileExists(outputDir))
+                    mkpath(outputDir);
 
-		filename = std::string(outputDir) + "/" + filename;
-	    }
+                filename = std::string(outputDir) + "/" + filename;
+            }
 
-	    if (endsWith(filename, ".epub"))
-		type = gourou::DRMProcessor::ITEM_TYPE::EPUB;
-	    else if (endsWith(filename, ".pdf"))
-		type = gourou::DRMProcessor::ITEM_TYPE::PDF;
-	    else
-	    {
-		EXCEPTION(gourou::DRM_FORMAT_NOT_SUPPORTED, "Unsupported file format of " << filename);
-	    }
-	    
-	    if (inputFile != filename)
-	    {
-		unlink(filename.c_str());
-		fileCopy(inputFile, filename.c_str());
-		processor.removeDRM(inputFile, filename, type, encryptionKey, encryptionKeySize);
-		std::cout << "DRM removed into new file " << filename << std::endl;
-	    }
-	    else
-	    {
-		// Use temp file for PDF
-		if (type == gourou::DRMProcessor::ITEM_TYPE::PDF)
-		{
-		    std::string tempFile = filename + ".tmp";
-		    /* Be sure there is not already a temp file */
-		    unlink(tempFile.c_str());
-		    processor.removeDRM(filename, tempFile, type, encryptionKey, encryptionKeySize);
-		    /* Original file must be removed before doing a copy... */
-		    unlink(filename.c_str());
-		    if (rename(tempFile.c_str(), filename.c_str()))
-		    {
-			EXCEPTION(gourou::DRM_FILE_ERROR, "Unable to copy " << tempFile << " into " << filename);
-		    }
-		}
-		else
-		    processor.removeDRM(inputFile, filename, type, encryptionKey, encryptionKeySize);
-		std::cout << "DRM removed from " << filename << std::endl;
-	    }
-	} catch(std::exception& e)
-	{
-	    std::cout << e.what() << std::endl;
-	    ret = 1;
-	}
+            if (endsWith(filename, ".epub"))
+                type = gourou::DRMProcessor::ITEM_TYPE::EPUB;
+            else if (endsWith(filename, ".pdf"))
+                type = gourou::DRMProcessor::ITEM_TYPE::PDF;
+            else
+            {
+                EXCEPTION(gourou::DRM_FORMAT_NOT_SUPPORTED, "Unsupported file format of " << filename);
+            }
+    
+            if (inputFile != filename)
+            {
+                unlink(filename.c_str());
+                fileCopy(inputFile, filename.c_str());
+                processor.removeDRM(inputFile, filename, type, encryptionKey, encryptionKeySize);
+                std::cout << "DRM removed into new file " << filename << std::endl;
+            }
+            else
+            {
+                // Use temp file for PDF
+                if (type == gourou::DRMProcessor::ITEM_TYPE::PDF)
+                {
+                    std::string tempFile = filename + ".tmp";
+                    /* Be sure there is not already a temp file */
+                    unlink(tempFile.c_str());
+                    processor.removeDRM(filename, tempFile, type, encryptionKey, encryptionKeySize);
+                    /* Original file must be removed before doing a copy... */
+                    unlink(filename.c_str());
+                    if (rename(tempFile.c_str(), filename.c_str()))
+                    {
+                        EXCEPTION(gourou::DRM_FILE_ERROR, "Unable to copy " << tempFile << " into " << filename);
+                    }
+                }
+                else
+                    processor.removeDRM(inputFile, filename, type, encryptionKey, encryptionKeySize);
+                std::cout << "DRM removed from " << filename << std::endl;
+            }
+        } catch(std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+            ret = 1;
+        }
 
-	return ret;
+        return ret;
     }
-};	      
+};    
 
 static void usage(const char* cmd)
 {
     std::cout << basename((char*)cmd) << " remove ADEPT DRM (from Adobe) of EPUB/PDF file" << std::endl << std::endl;
-    
+
     std::cout << "Usage: " << basename((char*)cmd) << " [OPTIONS] file(.epub|pdf)" << std::endl << std::endl;
-    
+
     std::cout << "Global Options:" << std::endl;
     std::cout << "  " << "-O|--output-dir"      << "\t"   << "Optional output directory were to put result (default ./)" << std::endl;
     std::cout << "  " << "-o|--output-file"     << "\t"   << "Optional output filename (default inplace DRM removal>)" << std::endl;
@@ -181,82 +181,82 @@ int main(int argc, char** argv)
     std::string _deviceFile, _activationFile, _devicekeyFile;
 
     while (1) {
-	int option_index = 0;
-	static struct option long_options[] = {
-	    {"adept-directory",  required_argument, 0,  'D' },
-	    {"device-file",      required_argument, 0,  'd' },
-	    {"activation-file",  required_argument, 0,  'a' },
-	    {"device-key-file",  required_argument, 0,  'k' },
-	    {"output-dir",       required_argument, 0,  'O' },
-	    {"output-file",      required_argument, 0,  'o' },
-	    {"input-file",       required_argument, 0,  'f' },
-	    {"encryption-key",   required_argument, 0,  'K' }, // Private option
-	    {"verbose",          no_argument,       0,  'v' },
-	    {"version",          no_argument,       0,  'V' },
-	    {"help",             no_argument,       0,  'h' },
-	    {0,                  0,                 0,  0 }
-	};
+        int option_index = 0;
+        static struct option long_options[] = {
+            {"adept-directory",  required_argument, 0,  'D' },
+            {"device-file",      required_argument, 0,  'd' },
+            {"activation-file",  required_argument, 0,  'a' },
+            {"device-key-file",  required_argument, 0,  'k' },
+            {"output-dir",       required_argument, 0,  'O' },
+            {"output-file",      required_argument, 0,  'o' },
+            {"input-file",       required_argument, 0,  'f' },
+            {"encryption-key",   required_argument, 0,  'K' }, // Private option
+            {"verbose",          no_argument,       0,  'v' },
+            {"version",          no_argument,       0,  'V' },
+            {"help",             no_argument,       0,  'h' },
+            {0,                  0,                 0,  0 }
+        };
 
-	c = getopt_long(argc, argv, "D:d:a:k:O:o:f:K:vVh",
+        c = getopt_long(argc, argv, "D:d:a:k:O:o:f:K:vVh",
                         long_options, &option_index);
-	if (c == -1)
-	    break;
+        if (c == -1)
+            break;
 
-	switch (c) {
-	case 'D':
-	    _deviceFile = std::string(optarg) + "/device.xml";
-	    _activationFile = std::string(optarg) + "/activation.xml";
-	    _devicekeyFile = std::string(optarg) + "/devicesalt";
-	    deviceFile = _deviceFile.c_str();
-	    activationFile = _activationFile.c_str();
-	    devicekeyFile = _devicekeyFile.c_str();
-	    break;
-	case 'd':
-	    deviceFile = optarg;
-	    break;
-	case 'a':
-	    activationFile = optarg;
-	    break;
-	case 'k':
-	    devicekeyFile = optarg;
-	    break;
-	case 'f':
-	    inputFile = optarg;
-	    break;
-	case 'O':
-	    outputDir = optarg;
-	    break;
-	case 'o':
-	    outputFile = optarg;
-	    break;
-	case 'K':
-	    encryptionKeyUser = optarg;
-	    break;
-	case 'v':
-	    verbose++;
-	    break;
-	case 'V':
-	    version();
-	    return 0;
-	case 'h':
-	    usage(argv[0]);
-	    return 0;
-	default:
-	    usage(argv[0]);
-	    return -1;
-	}
+        switch (c) {
+        case 'D':
+            _deviceFile = std::string(optarg) + "/device.xml";
+            _activationFile = std::string(optarg) + "/activation.xml";
+            _devicekeyFile = std::string(optarg) + "/devicesalt";
+            deviceFile = _deviceFile.c_str();
+            activationFile = _activationFile.c_str();
+            devicekeyFile = _devicekeyFile.c_str();
+            break;
+        case 'd':
+            deviceFile = optarg;
+            break;
+        case 'a':
+            activationFile = optarg;
+            break;
+        case 'k':
+            devicekeyFile = optarg;
+            break;
+        case 'f':
+            inputFile = optarg;
+            break;
+        case 'O':
+            outputDir = optarg;
+            break;
+        case 'o':
+            outputFile = optarg;
+            break;
+        case 'K':
+            encryptionKeyUser = optarg;
+            break;
+        case 'v':
+            verbose++;
+            break;
+        case 'V':
+            version();
+            return 0;
+        case 'h':
+            usage(argv[0]);
+            return 0;
+        default:
+            usage(argv[0]);
+            return -1;
+        }
     }
-   
+
     gourou::DRMProcessor::setLogLevel(verbose);
 
     if (optind == argc-1)
-	inputFile = argv[optind];
+        inputFile = argv[optind];
 
     if (!inputFile || (outputDir && !outputDir[0]) ||
-	(outputFile && !outputFile[0]))
+        (outputFile && !outputFile[0]))
     {
-	usage(argv[0]);
-	return -1;
+        usage(argv[0]);
+        return -1;
     }
 
     ADEPTRemove remover;
@@ -266,56 +266,56 @@ int main(int argc, char** argv)
     const char* orig;
     for (i=0; i<(int)ARRAY_SIZE(files); i++)
     {
-	orig = *files[i];
-	*files[i] = findFile(*files[i]);
-	if (!*files[i])
-	{
-	    std::cout << "Error : " << orig << " doesn't exists, did you activate your device ?" << std::endl;
-	    ret = -1;
-	    hasErrors = true;
-	}
+        orig = *files[i];
+        *files[i] = findFile(*files[i]);
+        if (!*files[i])
+        {
+            std::cout << "Error : " << orig << " doesn't exists, did you activate your device ?" << std::endl;
+            ret = -1;
+            hasErrors = true;
+        }
     }
 
     if (encryptionKeyUser)
     {
-	int size = std::string(encryptionKeyUser).size();
-	if ((size % 2))
-	{
-	    std::cout << "Error : Encryption key must be odd length" << std::endl;
-	    goto end;
-	}
+        int size = std::string(encryptionKeyUser).size();
+        if ((size % 2))
+        {
+            std::cout << "Error : Encryption key must be odd length" << std::endl;
+            goto end;
+        }
 
-	if (encryptionKeyUser[0] == '0' && encryptionKeyUser[1] == 'x')
-	{
-	    encryptionKeyUser += 2;
-	    size -= 2;
-	}
+        if (encryptionKeyUser[0] == '0' && encryptionKeyUser[1] == 'x')
+        {
+            encryptionKeyUser += 2;
+            size -= 2;
+        }
 
-	encryptionKey = new unsigned char[size/2];
+        encryptionKey = new unsigned char[size/2];
 
-	for(i=0; i<size; i+=2)
-	{
-	    encryptionKey[i/2]  = htoi(encryptionKeyUser[i]) << 4;
-	    encryptionKey[i/2] |= htoi(encryptionKeyUser[i+1]);
-	}
+        for(i=0; i<size; i+=2)
+        {
+            encryptionKey[i/2]  = htoi(encryptionKeyUser[i]) << 4;
+            encryptionKey[i/2] |= htoi(encryptionKeyUser[i+1]);
+        }
 
-	encryptionKeySize = size/2;
+        encryptionKeySize = size/2;
     }
-    
+
     if (hasErrors)
-	goto end;
-       
+        goto end;
+
     ret = remover.run();
-    
+
 end:
     for (i=0; i<(int)ARRAY_SIZE(files); i++)
     {
-	if (*files[i])
-	    free((void*)*files[i]);
+        if (*files[i])
+            free((void*)*files[i]);
     }
 
     if (encryptionKey)
-	free(encryptionKey);
-    
+        free(encryptionKey);
+
     return ret;
 }

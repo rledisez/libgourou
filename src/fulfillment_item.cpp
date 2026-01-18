@@ -25,109 +25,109 @@
 namespace gourou
 {
     FulfillmentItem::FulfillmentItem(pugi::xml_document& doc, User* user)
-	: fulfillDoc(), loanToken(0)
+        : fulfillDoc(), loanToken(0)
     {
-	fulfillDoc.reset(doc); /* We must keep a copy */
-	metadatas = fulfillDoc.select_node("//metadata").node();
-	
-	if (!metadatas)
-	    EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No metadata tag in document");
-	
-	pugi::xml_node node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/src").node();
-	downloadURL = node.first_child().value();
+        fulfillDoc.reset(doc); /* We must keep a copy */
+        metadatas = fulfillDoc.select_node("//metadata").node();
 
-	if (downloadURL == "")
-	    EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No download URL in document");
-	
-	node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/resource").node();
-	resource = node.first_child().value();
+        if (!metadatas)
+            EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No metadata tag in document");
 
-	if (resource == "")
-	    EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No resource in document");
+        pugi::xml_node node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/src").node();
+        downloadURL = node.first_child().value();
 
-	pugi::xml_node licenseToken = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken").node();
+        if (downloadURL == "")
+            EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No download URL in document");
 
-	if (!licenseToken)
-	    EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "Any license token in document");
-	
-	buildRights(licenseToken, user);
+        node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/resource").node();
+        resource = node.first_child().value();
 
-	node = doc.select_node("/envelope/fulfillmentResult/returnable").node();
-	try
-	{
-	    if (node && node.first_child().value() == std::string("true"))
-		loanToken = new LoanToken(doc);
-	}
-	catch(std::exception& e)
-	{
-	    GOUROU_LOG(ERROR, "Book is returnable, but contains invalid loan token");
-	    GOUROU_LOG(ERROR, e.what());
-	}
+        if (resource == "")
+            EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "No resource in document");
+
+        pugi::xml_node licenseToken = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken").node();
+
+        if (!licenseToken)
+            EXCEPTION(FFI_INVALID_FULFILLMENT_DATA, "Any license token in document");
+
+        buildRights(licenseToken, user);
+
+        node = doc.select_node("/envelope/fulfillmentResult/returnable").node();
+        try
+        {
+            if (node && node.first_child().value() == std::string("true"))
+                loanToken = new LoanToken(doc);
+        }
+        catch(std::exception& e)
+        {
+            GOUROU_LOG(ERROR, "Book is returnable, but contains invalid loan token");
+            GOUROU_LOG(ERROR, e.what());
+        }
     }
 
     FulfillmentItem::~FulfillmentItem()
     {
-	if (loanToken) delete loanToken;
+        if (loanToken) delete loanToken;
     }
-    
+
     void FulfillmentItem::buildRights(const pugi::xml_node& licenseToken, User* user)
     {
-	pugi::xml_node decl = rights.append_child(pugi::node_declaration);
-	decl.append_attribute("version") = "1.0";
-	
-	pugi::xml_node root = rights.append_child("adept:rights");
-	root.append_attribute("xmlns:adept") = ADOBE_ADEPT_NS;
-	
-	pugi::xml_node newLicenseToken = root.append_copy(licenseToken);
-	if (!newLicenseToken.attribute("xmlns"))
-	    newLicenseToken.append_attribute("xmlns") = ADOBE_ADEPT_NS;
+        pugi::xml_node decl = rights.append_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
 
-	pugi::xml_node licenseServiceInfo = root.append_child("adept:licenseServiceInfo");
-	pugi::xml_node licenseURL = licenseToken.select_node("licenseURL").node();
-	licenseURL.set_name("adept:licenseURL");
-	licenseServiceInfo.append_copy(licenseURL);
-	pugi::xml_node certificate = licenseServiceInfo.append_child("adept:certificate");
-	std::string certificateValue = user->getLicenseServiceCertificate(licenseURL.first_child().value());
-	certificate.append_child(pugi::node_pcdata).set_value(certificateValue.c_str());
+        pugi::xml_node root = rights.append_child("adept:rights");
+        root.append_attribute("xmlns:adept") = ADOBE_ADEPT_NS;
+
+        pugi::xml_node newLicenseToken = root.append_copy(licenseToken);
+        if (!newLicenseToken.attribute("xmlns"))
+            newLicenseToken.append_attribute("xmlns") = ADOBE_ADEPT_NS;
+
+        pugi::xml_node licenseServiceInfo = root.append_child("adept:licenseServiceInfo");
+        pugi::xml_node licenseURL = licenseToken.select_node("licenseURL").node();
+        licenseURL.set_name("adept:licenseURL");
+        licenseServiceInfo.append_copy(licenseURL);
+        pugi::xml_node certificate = licenseServiceInfo.append_child("adept:certificate");
+        std::string certificateValue = user->getLicenseServiceCertificate(licenseURL.first_child().value());
+        certificate.append_child(pugi::node_pcdata).set_value(certificateValue.c_str());
     }
-    
+
     std::string FulfillmentItem::getMetadata(std::string name)
     {
-	// https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case
-	#if __STDC_VERSION__ >= 201112L
-	std::transform(name.begin(), name.end(), name.begin(),
-		       [](unsigned char c){ return std::tolower(c); });
-	#else
-	std::transform(name.begin(), name.end(), name.begin(), tolower);
-	#endif
-	name = std::string("dc:") + name;
-	pugi::xpath_node path = metadatas.select_node(name.c_str());
+        // https://stackoverflow.com/questions/313970/how-to-convert-an-instance-of-stdstring-to-lower-case
+#if __STDC_VERSION__ >= 201112L
+        std::transform(name.begin(), name.end(), name.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+#else
+        std::transform(name.begin(), name.end(), name.begin(), tolower);
+#endif
+        name = std::string("dc:") + name;
+        pugi::xpath_node path = metadatas.select_node(name.c_str());
 
-	if (!path)
-	    return "";
+        if (!path)
+            return "";
 
-	return path.node().first_child().value();
+        return path.node().first_child().value();
     }
-    
+
     std::string FulfillmentItem::getRights()
     {
-	StringXMLWriter xmlWriter;
-	rights.save(xmlWriter, "  ");
-	return xmlWriter.getResult();
+        StringXMLWriter xmlWriter;
+        rights.save(xmlWriter, "  ");
+        return xmlWriter.getResult();
     }
-   
+
     std::string FulfillmentItem::getDownloadURL()
     {
-	return downloadURL;
+        return downloadURL;
     }
 
     std::string FulfillmentItem::getResource()
     {
-	return resource;
+        return resource;
     }
 
     LoanToken* FulfillmentItem::getLoanToken()
     {
-	return loanToken;
+        return loanToken;
     }
 }

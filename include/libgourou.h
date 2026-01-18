@@ -48,204 +48,204 @@ namespace gourou
     {
     public:
 
-	static const std::string VERSION;
+        static const std::string VERSION;
 
-	enum ITEM_TYPE { EPUB=0, PDF };
-	/**
-	 * @brief Main constructor. To be used once all is configured (user has signedIn, device is activated)
-	 *
-	 * @param client          Client processor
-	 * @param deviceFile      Path of device.xml
-	 * @param activationFile  Path of activation.xml
-	 * @param deviceKeyFile   Path of devicesalt
-	 */
+        enum ITEM_TYPE { EPUB=0, PDF };
+        /**
+         * @brief Main constructor. To be used once all is configured (user has signedIn, device is activated)
+         *
+         * @param client          Client processor
+         * @param deviceFile      Path of device.xml
+         * @param activationFile  Path of activation.xml
+         * @param deviceKeyFile   Path of devicesalt
+         */
         DRMProcessor(DRMProcessorClient* client, const std::string& deviceFile, const std::string& activationFile, const std::string& deviceKeyFile);
-	
-	~DRMProcessor();
 
-	/**
-	 * @brief Fulfill ACSM file to server in order to retrieve ePub fulfillment item
-	 *
-	 * @param ACSMFile       Path of ACSMFile
-	 * @param notify         Notify server if requested by response
-	 *
-	 * @return a FulfillmentItem if all is OK
-	 */
-	FulfillmentItem* fulfill(const std::string& ACSMFile, bool notify=true);
+        ~DRMProcessor();
 
-	/**
-	 * @brief Once fulfilled, ePub file needs to be downloaded.
-	 * During this operation, DRM information is added into downloaded file
-	 *
-	 * @param item            Item from fulfill() method
-	 * @param path            Output file path 
-	 * @param resume          false if target file should be truncated, true to try resume download
-	 *
-	 * @return Type of downloaded item
-	 */
-	ITEM_TYPE download(FulfillmentItem* item, std::string path, bool resume=false);
+        /**
+         * @brief Fulfill ACSM file to server in order to retrieve ePub fulfillment item
+         *
+         * @param ACSMFile       Path of ACSMFile
+         * @param notify         Notify server if requested by response
+         *
+         * @return a FulfillmentItem if all is OK
+         */
+        FulfillmentItem* fulfill(const std::string& ACSMFile, bool notify=true);
 
-	/**
-	 * @brief SignIn into ACS Server (required to activate device)
-	 * 
-	 * @param adobeID         AdobeID username
-	 * @param adobePassword   Adobe password
-	 */
-	void signIn(const std::string& adobeID, const std::string& adobePassword);
+        /**
+         * @brief Once fulfilled, ePub file needs to be downloaded.
+         * During this operation, DRM information is added into downloaded file
+         *
+         * @param item            Item from fulfill() method
+         * @param path            Output file path
+         * @param resume          false if target file should be truncated, true to try resume download
+         *
+         * @return Type of downloaded item
+         */
+        ITEM_TYPE download(FulfillmentItem* item, std::string path, bool resume=false);
 
-	/**
-	 * @brief Activate newly created device (user must have successfuly signedIn before)
-	 */
-	void activateDevice();
+        /**
+         * @brief SignIn into ACS Server (required to activate device)
+         *
+         * @param adobeID         AdobeID username
+         * @param adobePassword   Adobe password
+         */
+        void signIn(const std::string& adobeID, const std::string& adobePassword);
 
-	/**
-	 * @brief Return loaned book to server
-	 *
-	 * @param loanID          Loan ID received during fulfill
-	 * @param operatorURL     URL of operator that loans this book
-	 * @param notify          Notify server if requested by response
-	 */
-	void returnLoan(const std::string& loanID, const std::string& operatorURL, bool notify=true);
+        /**
+         * @brief Activate newly created device (user must have successfuly signedIn before)
+         */
+        void activateDevice();
 
-	/**
-	 * @brief Return default ADEPT directory (ie /home/<user>/.config/adept)
-	 */	 
-	static std::string getDefaultAdeptDir(void);
-	
-	/**
-	 * @brief Create a new ADEPT environment (device.xml, devicesalt and activation.xml).
-	 *
-	 * @param client          Client processor
-	 * @param randomSerial    Always generate a new device (or not)
-	 * @param dirName         Directory where to put generated files (.adept)
-	 * @param hobbes          Override hobbes default version
-	 * @param ACSServer       Override main ACS server (default adeactivate.adobe.com)
-	 */
+        /**
+         * @brief Return loaned book to server
+         *
+         * @param loanID          Loan ID received during fulfill
+         * @param operatorURL     URL of operator that loans this book
+         * @param notify          Notify server if requested by response
+         */
+        void returnLoan(const std::string& loanID, const std::string& operatorURL, bool notify=true);
+
+        /**
+         * @brief Return default ADEPT directory (ie /home/<user>/.config/adept)
+         */
+        static std::string getDefaultAdeptDir(void);
+
+        /**
+         * @brief Create a new ADEPT environment (device.xml, devicesalt and activation.xml).
+         *
+         * @param client          Client processor
+         * @param randomSerial    Always generate a new device (or not)
+         * @param dirName         Directory where to put generated files (.adept)
+         * @param hobbes          Override hobbes default version
+         * @param ACSServer       Override main ACS server (default adeactivate.adobe.com)
+         */
         static DRMProcessor* createDRMProcessor(DRMProcessorClient* client,
-						bool randomSerial=false, std::string dirName=std::string(""),
-						const std::string& hobbes=std::string(HOBBES_DEFAULT_VERSION),
-						const std::string& ACSServer=ACS_SERVER);
+                                                bool randomSerial=false, std::string dirName=std::string(""),
+                                                const std::string& hobbes=std::string(HOBBES_DEFAULT_VERSION),
+                                                const std::string& ACSServer=ACS_SERVER);
 
-	/**
-	 * @brief Get current log level
-	 */
-	static int getLogLevel();
+        /**
+         * @brief Get current log level
+         */
+        static int getLogLevel();
 
-	/**
-	 * @brief Set log level (higher number for verbose output)
-	 */
-	static void setLogLevel(int logLevel);
+        /**
+         * @brief Set log level (higher number for verbose output)
+         */
+        static void setLogLevel(int logLevel);
 
-	/**
-	 * Functions used internally, should not be called by user
-	 */
+        /**
+         * Functions used internally, should not be called by user
+         */
 
-	/**
-	 * @brief Send HTTP (GET or POST) request
-	 *
-	 * @param URL             HTTP URL
-	 * @param POSTData        POST data if needed, if not set, a GET request is done
-	 * @param contentType     Optional content type of POST Data
-	 * @param responseHeaders Optional Response headers of HTTP request
-	 * @param fd              Optional File descriptor to write received data
-	 * @param resume          false if target file should be truncated, true to try resume download (works only in combination of a valid fd)
-	 *
-	 * @return data of HTTP response
-	 */
-	ByteArray sendRequest(const std::string& URL, const std::string& POSTData=std::string(), const char* contentType=0, std::map<std::string, std::string>* responseHeaders=0, int fd=0, bool resume=false);
+        /**
+         * @brief Send HTTP (GET or POST) request
+         *
+         * @param URL             HTTP URL
+         * @param POSTData        POST data if needed, if not set, a GET request is done
+         * @param contentType     Optional content type of POST Data
+         * @param responseHeaders Optional Response headers of HTTP request
+         * @param fd              Optional File descriptor to write received data
+         * @param resume          false if target file should be truncated, true to try resume download (works only in combination of a valid fd)
+         *
+         * @return data of HTTP response
+         */
+        ByteArray sendRequest(const std::string& URL, const std::string& POSTData=std::string(), const char* contentType=0, std::map<std::string, std::string>* responseHeaders=0, int fd=0, bool resume=false);
 
-	/**
-	 * @brief Send HTTP POST request to URL with document as POSTData
-	 */
-	ByteArray sendRequest(const pugi::xml_document& document, const std::string& url);
-	
-	/**
-	 * @brief In place encrypt data with private device key
-	 */
-	ByteArray encryptWithDeviceKey(const unsigned char* data, unsigned int len);
+        /**
+         * @brief Send HTTP POST request to URL with document as POSTData
+         */
+        ByteArray sendRequest(const pugi::xml_document& document, const std::string& url);
 
-	/**
-	 * @brief In place decrypt data with private device key
-	 */
-	ByteArray decryptWithDeviceKey(const unsigned char* data, unsigned int len);
+        /**
+         * @brief In place encrypt data with private device key
+         */
+        ByteArray encryptWithDeviceKey(const unsigned char* data, unsigned int len);
 
-	/**
-	 * @brief Return base64 encoded value of RSA public key
-	 */
-	std::string serializeRSAPublicKey(void* rsa);
+        /**
+         * @brief In place decrypt data with private device key
+         */
+        ByteArray decryptWithDeviceKey(const unsigned char* data, unsigned int len);
 
-	/**
-	 * @brief Return base64 encoded value of RSA private key encrypted with private device key
-	 */
-	std::string serializeRSAPrivateKey(void* rsa);
+        /**
+         * @brief Return base64 encoded value of RSA public key
+         */
+        std::string serializeRSAPublicKey(void* rsa);
 
-	/**
-	 * @brief Export clear private license key into path
-	 */
-	void exportPrivateLicenseKey(std::string path);
-	
-	/**
-	 * @brief Get current user
-	 */
-	User* getUser() { return user; }
+        /**
+         * @brief Return base64 encoded value of RSA private key encrypted with private device key
+         */
+        std::string serializeRSAPrivateKey(void* rsa);
 
-	/**
-	 * @brief Get current device
-	 */
-	Device* getDevice() { return device; }
+        /**
+         * @brief Export clear private license key into path
+         */
+        void exportPrivateLicenseKey(std::string path);
 
-	/**
-	 * @brief Get current client
-	 */
-	DRMProcessorClient* getClient() { return client; }
-		
-	/**
-	 * @brief Remove ADEPT DRM
-	 * Warning: for PDF format, filenameIn must be different than filenameOut
-	 *
-	 * @param filenameIn         Input file (with ADEPT DRM)
-	 * @param filenameOut        Output file (without ADEPT DRM)
-	 * @param type               Type of file (ePub or PDF)
-	 * @param encryptionKey      Optional encryption key, do not try to decrypt the one inside input file
-	 * @param encryptionKeySize  Size of encryption key (if provided)
-	 */
-	void removeDRM(const std::string& filenameIn, const std::string& filenameOut, ITEM_TYPE type, const unsigned char* encryptionKey=0, unsigned encryptionKeySize=0);
-	
+        /**
+         * @brief Get current user
+         */
+        User* getUser() { return user; }
+
+        /**
+         * @brief Get current device
+         */
+        Device* getDevice() { return device; }
+
+        /**
+         * @brief Get current client
+         */
+        DRMProcessorClient* getClient() { return client; }
+
+        /**
+         * @brief Remove ADEPT DRM
+         * Warning: for PDF format, filenameIn must be different than filenameOut
+         *
+         * @param filenameIn         Input file (with ADEPT DRM)
+         * @param filenameOut        Output file (without ADEPT DRM)
+         * @param type               Type of file (ePub or PDF)
+         * @param encryptionKey      Optional encryption key, do not try to decrypt the one inside input file
+         * @param encryptionKeySize  Size of encryption key (if provided)
+         */
+        void removeDRM(const std::string& filenameIn, const std::string& filenameOut, ITEM_TYPE type, const unsigned char* encryptionKey=0, unsigned encryptionKeySize=0);
+
     private:
-	gourou::DRMProcessorClient* client;
+        gourou::DRMProcessorClient* client;
         gourou::Device* device;
         gourou::User* user;
-	
+
         DRMProcessor(DRMProcessorClient* client);
-	
-	void pushString(void* sha_ctx, const std::string& string);
-	void pushTag(void* sha_ctx, uint8_t tag);
-	void hashNode(const pugi::xml_node& root, void *sha_ctx, std::map<std::string,std::string> nsHash);
-	void hashNode(const pugi::xml_node& root, unsigned char* sha_out);
-	void signNode(pugi::xml_node& rootNode);
-	void addNonce(pugi::xml_node& root);
-	void buildAuthRequest(pugi::xml_document& authReq);
-	void buildInitLicenseServiceRequest(pugi::xml_document& initLicReq, std::string operatorURL);
-	void doOperatorAuth(std::string operatorURL);
-	void operatorAuth(std::string operatorURL);
-	void buildFulfillRequest(pugi::xml_document& acsmDoc, pugi::xml_document& fulfillReq);
-	void buildActivateReq(pugi::xml_document& activateReq);
-	void buildReturnReq(pugi::xml_document& returnReq, const std::string& loanID, const std::string& operatorURL);
-	ByteArray sendFulfillRequest(const pugi::xml_document& document, const std::string& url);
-	void buildSignInRequest(pugi::xml_document& signInRequest, const std::string& adobeID, const std::string& adobePassword, const std::string& authenticationCertificate);
-	void fetchLicenseServiceCertificate(const std::string& licenseURL,
-					    const std::string& operatorURL);
-	void buildNotifyReq(pugi::xml_document& returnReq, pugi::xml_node& body);	
-	void notifyServer(pugi::xml_node& notifyRoot);
-	void notifyServer(pugi::xml_document& fulfillReply);
-	std::string encryptedKeyFirstPass(pugi::xml_document& rightsDoc, const std::string& encryptedKey, const std::string& keyType);
-	void decryptADEPTKey(pugi::xml_document& rightsDoc, unsigned char* decryptedKey, const unsigned char* encryptionKey=0, unsigned encryptionKeySize=0);
-	void removeEPubDRM(const std::string& filenameIn, const std::string& filenameOut, const unsigned char* encryptionKey, unsigned encryptionKeySize);
-	void generatePDFObjectKey(int version,
-				  const unsigned char* masterKey, unsigned int masterKeyLength,
-				  int objectId, int objectGenerationNumber,
-				  unsigned char* keyOut);
-	void removePDFDRM(const std::string& filenameIn, const std::string& filenameOut, const unsigned char* encryptionKey, unsigned encryptionKeySize);
+
+        void pushString(void* sha_ctx, const std::string& string);
+        void pushTag(void* sha_ctx, uint8_t tag);
+        void hashNode(const pugi::xml_node& root, void *sha_ctx, std::map<std::string,std::string> nsHash);
+        void hashNode(const pugi::xml_node& root, unsigned char* sha_out);
+        void signNode(pugi::xml_node& rootNode);
+        void addNonce(pugi::xml_node& root);
+        void buildAuthRequest(pugi::xml_document& authReq);
+        void buildInitLicenseServiceRequest(pugi::xml_document& initLicReq, std::string operatorURL);
+        void doOperatorAuth(std::string operatorURL);
+        void operatorAuth(std::string operatorURL);
+        void buildFulfillRequest(pugi::xml_document& acsmDoc, pugi::xml_document& fulfillReq);
+        void buildActivateReq(pugi::xml_document& activateReq);
+        void buildReturnReq(pugi::xml_document& returnReq, const std::string& loanID, const std::string& operatorURL);
+        ByteArray sendFulfillRequest(const pugi::xml_document& document, const std::string& url);
+        void buildSignInRequest(pugi::xml_document& signInRequest, const std::string& adobeID, const std::string& adobePassword, const std::string& authenticationCertificate);
+        void fetchLicenseServiceCertificate(const std::string& licenseURL,
+                                            const std::string& operatorURL);
+        void buildNotifyReq(pugi::xml_document& returnReq, pugi::xml_node& body);
+        void notifyServer(pugi::xml_node& notifyRoot);
+        void notifyServer(pugi::xml_document& fulfillReply);
+        std::string encryptedKeyFirstPass(pugi::xml_document& rightsDoc, const std::string& encryptedKey, const std::string& keyType);
+        void decryptADEPTKey(pugi::xml_document& rightsDoc, unsigned char* decryptedKey, const unsigned char* encryptionKey=0, unsigned encryptionKeySize=0);
+        void removeEPubDRM(const std::string& filenameIn, const std::string& filenameOut, const unsigned char* encryptionKey, unsigned encryptionKeySize);
+        void generatePDFObjectKey(int version,
+                                  const unsigned char* masterKey, unsigned int masterKeyLength,
+                                  int objectId, int objectGenerationNumber,
+                                  unsigned char* keyOut);
+        void removePDFDRM(const std::string& filenameIn, const std::string& filenameOut, const unsigned char* encryptionKey, unsigned encryptionKeySize);
     };
 }
 

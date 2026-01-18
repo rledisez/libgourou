@@ -24,57 +24,57 @@ namespace gourou
 {
     LoanToken::LoanToken(pugi::xml_document& doc)
     {
-	pugi::xml_node node = doc.select_node("/envelope/loanToken").node();
+        pugi::xml_node node = doc.select_node("/envelope/loanToken").node();
 
-	if (!node)
-	    EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken element in document");
+        if (!node)
+            EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken element in document");
 
-	node = doc.select_node("/envelope/fulfillmentResult/fulfillment").node();
+        node = doc.select_node("/envelope/fulfillmentResult/fulfillment").node();
 
-	if (node)
-	    properties["id"] = node.first_child().value();
-	else
-	{
-	    EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No fulfillment element in document");
-	}
+        if (node)
+            properties["id"] = node.first_child().value();
+        else
+        {
+            EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No fulfillment element in document");
+        }
 
-	node = doc.select_node("/envelope/loanToken/operatorURL").node();
+        node = doc.select_node("/envelope/loanToken/operatorURL").node();
 
-	if (!node)
-	    EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken/operatorURL element in document");
+        if (!node)
+            EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken/operatorURL element in document");
 
-	properties["operatorURL"] = node.first_child().value();
+        properties["operatorURL"] = node.first_child().value();
 
-	node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken/permissions/display/until").node();
+        node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken/permissions/display/until").node();
 
-	if (node)
-	    properties["validity"] = node.first_child().value();
-	else
-	{
-	    node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken/permissions/play/until").node();
+        if (node)
+            properties["validity"] = node.first_child().value();
+        else
+        {
+            node = doc.select_node("/envelope/fulfillmentResult/resourceItemInfo/licenseToken/permissions/play/until").node();
 
-	    if (node)
-		properties["validity"] = node.first_child().value();
-	    else
-		EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken/operatorURL element in document");
-	}
+            if (node)
+                properties["validity"] = node.first_child().value();
+            else
+                EXCEPTION(FFI_INVALID_LOAN_TOKEN, "No loanToken/operatorURL element in document");
+        }
     }
 
     std::string LoanToken::getProperty(const std::string& property, const std::string& _default)
     {
-	if (properties.find(property) == properties.end())
-	{
-	    if (_default == "")
-		EXCEPTION(GOUROU_INVALID_PROPERTY, "Invalid property " << property);
+        if (properties.find(property) == properties.end())
+        {
+            if (_default == "")
+                EXCEPTION(GOUROU_INVALID_PROPERTY, "Invalid property " << property);
 
-	    return _default;
-	}
+            return _default;
+        }
 
-	return properties[property];
+        return properties[property];
     }
 
     std::string LoanToken::operator[](const std::string& property)
     {
-	return getProperty(property);
+        return getProperty(property);
     }
 }

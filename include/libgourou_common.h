@@ -43,152 +43,152 @@ namespace gourou
     /**
      * Some common utilities
      */
-    
-    #define ADOBE_ADEPT_NS  "http://ns.adobe.com/adept"
+
+#define ADOBE_ADEPT_NS  "http://ns.adobe.com/adept"
 
     static const int SHA1_LEN           = 20;
     static const int RSA_KEY_SIZE       = 128;
     static const int RSA_KEY_SIZE_BITS  = (RSA_KEY_SIZE*8);
-    
+
     enum GOUROU_ERROR {
-	GOUROU_DEVICE_DOES_NOT_MATCH = 0x1000,
-	GOUROU_INVALID_CLIENT,
-	GOUROU_TAG_NOT_FOUND,
-	GOUROU_ADEPT_ERROR,
-	GOUROU_FILE_ERROR,
-	GOUROU_INVALID_PROPERTY
+        GOUROU_DEVICE_DOES_NOT_MATCH = 0x1000,
+        GOUROU_INVALID_CLIENT,
+        GOUROU_TAG_NOT_FOUND,
+        GOUROU_ADEPT_ERROR,
+        GOUROU_FILE_ERROR,
+        GOUROU_INVALID_PROPERTY
     };
 
     enum FULFILL_ERROR {
-	FF_ACSM_FILE_NOT_EXISTS = 0x1100,
-	FF_INVALID_ACSM_FILE,
-	FF_NO_HMAC_IN_ACSM_FILE,
-	FF_NOT_ACTIVATED,
-	FF_NO_OPERATOR_URL,
-	FF_SERVER_INTERNAL_ERROR
+        FF_ACSM_FILE_NOT_EXISTS = 0x1100,
+        FF_INVALID_ACSM_FILE,
+        FF_NO_HMAC_IN_ACSM_FILE,
+        FF_NOT_ACTIVATED,
+        FF_NO_OPERATOR_URL,
+        FF_SERVER_INTERNAL_ERROR
     };
 
     enum DOWNLOAD_ERROR {
-	DW_NO_ITEM = 0x1200,
-	DW_NO_EBX_HANDLER,
+        DW_NO_ITEM = 0x1200,
+        DW_NO_EBX_HANDLER,
     };
 
     enum SIGNIN_ERROR {
-	SIGN_INVALID_CREDENTIALS = 0x1300,
+        SIGN_INVALID_CREDENTIALS = 0x1300,
     };
-    
+
     enum ACTIVATE_ERROR {
-	ACTIVATE_NOT_SIGNEDIN = 0x1400
+        ACTIVATE_NOT_SIGNEDIN = 0x1400
     };
-    
+
     enum DEV_ERROR {
-	DEV_MKPATH = 0x2000,
-	DEV_MAC_ERROR,
-	DEV_INVALID_DEVICE_FILE,
-	DEV_INVALID_DEVICE_KEY_FILE,
-	DEV_INVALID_DEV_PROPERTY,
+        DEV_MKPATH = 0x2000,
+        DEV_MAC_ERROR,
+        DEV_INVALID_DEVICE_FILE,
+        DEV_INVALID_DEVICE_KEY_FILE,
+        DEV_INVALID_DEV_PROPERTY,
     };
 
     enum USER_ERROR {
-	USER_MKPATH = 0x3000,
-	USER_INVALID_ACTIVATION_FILE,
-	USER_NO_AUTHENTICATION_URL,
-	USER_NO_PROPERTY,
-	USER_INVALID_INPUT,
+        USER_MKPATH = 0x3000,
+        USER_INVALID_ACTIVATION_FILE,
+        USER_NO_AUTHENTICATION_URL,
+        USER_NO_PROPERTY,
+        USER_INVALID_INPUT,
     };
 
     enum FULFILL_ITEM_ERROR {
-	FFI_INVALID_FULFILLMENT_DATA = 0x4000,
-	FFI_INVALID_LOAN_TOKEN
+        FFI_INVALID_FULFILLMENT_DATA = 0x4000,
+        FFI_INVALID_LOAN_TOKEN
     };
-    
+
     enum CLIENT_ERROR {
-	CLIENT_BAD_PARAM = 0x5000,
-	CLIENT_INVALID_PKCS12,
-	CLIENT_INVALID_CERTIFICATE,
-	CLIENT_NO_PRIV_KEY,
-	CLIENT_NO_PUB_KEY,
-	CLIENT_RSA_ERROR,
-	CLIENT_BAD_CHAINING,
-	CLIENT_BAD_KEY_SIZE,
-	CLIENT_BAD_ZIP_FILE,
-	CLIENT_ZIP_ERROR,
-	CLIENT_GENERIC_EXCEPTION,
-	CLIENT_NETWORK_ERROR,
-	CLIENT_INVALID_PKCS8,
-	CLIENT_FILE_ERROR,
-	CLIENT_OSSL_ERROR,
-	CLIENT_CRYPT_ERROR,
-	CLIENT_DIGEST_ERROR,
-	CLIENT_HTTP_ERROR
+        CLIENT_BAD_PARAM = 0x5000,
+        CLIENT_INVALID_PKCS12,
+        CLIENT_INVALID_CERTIFICATE,
+        CLIENT_NO_PRIV_KEY,
+        CLIENT_NO_PUB_KEY,
+        CLIENT_RSA_ERROR,
+        CLIENT_BAD_CHAINING,
+        CLIENT_BAD_KEY_SIZE,
+        CLIENT_BAD_ZIP_FILE,
+        CLIENT_ZIP_ERROR,
+        CLIENT_GENERIC_EXCEPTION,
+        CLIENT_NETWORK_ERROR,
+        CLIENT_INVALID_PKCS8,
+        CLIENT_FILE_ERROR,
+        CLIENT_OSSL_ERROR,
+        CLIENT_CRYPT_ERROR,
+        CLIENT_DIGEST_ERROR,
+        CLIENT_HTTP_ERROR
     };
 
     enum DRM_REMOVAL_ERROR {
-	DRM_ERR_ENCRYPTION_KEY = 0x6000,
-	DRM_VERSION_NOT_SUPPORTED,
-	DRM_FILE_ERROR,
-	DRM_FORMAT_NOT_SUPPORTED,
-	DRM_IN_OUT_EQUALS,
-	DRM_MISSING_PARAMETER,
-	DRM_INVALID_KEY_SIZE,
-	DRM_ERR_ENCRYPTION_KEY_FP,
-	DRM_INVALID_USER
+        DRM_ERR_ENCRYPTION_KEY = 0x6000,
+        DRM_VERSION_NOT_SUPPORTED,
+        DRM_FILE_ERROR,
+        DRM_FORMAT_NOT_SUPPORTED,
+        DRM_IN_OUT_EQUALS,
+        DRM_MISSING_PARAMETER,
+        DRM_INVALID_KEY_SIZE,
+        DRM_ERR_ENCRYPTION_KEY_FP,
+        DRM_INVALID_USER
     };
-    
-    #ifndef _NOEXCEPT
-    #if __STDC_VERSION__ >= 201112L
-    #  define _NOEXCEPT noexcept
-    #  define _NOEXCEPT_(x) noexcept(x)
-    #else
-    #  define _NOEXCEPT throw()
-    #  define _NOEXCEPT_(x)
-    #endif
-    #endif /* !_NOEXCEPT */
-    
+
+#ifndef _NOEXCEPT
+#if __STDC_VERSION__ >= 201112L
+#  define _NOEXCEPT noexcept
+#  define _NOEXCEPT_(x) noexcept(x)
+#else
+#  define _NOEXCEPT throw()
+#  define _NOEXCEPT_(x)
+#endif
+#endif /* !_NOEXCEPT */
+
     /**
      * Generic exception class
      */
     class Exception : public std::exception
     {
     public:
-	Exception(int code, const char* message, const char* file, int line):
-	    code(code), line(line), file(file)
-	{
-	    std::stringstream msg;
-	    msg << "Exception code : 0x" << std::setbase(16) << code << std::endl;
-	    msg << "Message        : " << message << std::endl;
-	    if (logLevel >= LG_LOG_DEBUG)
-		msg << "File           : " << file << ":" << std::setbase(10) << line << std::endl;
-	    fullmessage = strdup(msg.str().c_str());
-	}
+        Exception(int code, const char* message, const char* file, int line):
+            code(code), line(line), file(file)
+        {
+            std::stringstream msg;
+            msg << "Exception code : 0x" << std::setbase(16) << code << std::endl;
+            msg << "Message        : " << message << std::endl;
+            if (logLevel >= LG_LOG_DEBUG)
+                msg << "File           : " << file << ":" << std::setbase(10) << line << std::endl;
+            fullmessage = strdup(msg.str().c_str());
+        }
 
-	Exception(const Exception& other)
-	{
-	    this->code = other.code;
-	    this->line = line;
-	    this->file = file;
-	    this->fullmessage = strdup(other.fullmessage);
-	}
+        Exception(const Exception& other)
+        {
+            this->code = other.code;
+            this->line = line;
+            this->file = file;
+            this->fullmessage = strdup(other.fullmessage);
+        }
 
-	~Exception() _NOEXCEPT
-	{
-	    free(fullmessage);
-	}
+        ~Exception() _NOEXCEPT
+        {
+            free(fullmessage);
+        }
 
-	const char * what () const throw () { return fullmessage; }
-	
-	int getErrorCode() {return code;}
-	
-	private:
-	int code, line;
-	const char* message, *file;
-	char* fullmessage;
+        const char * what () const throw () { return fullmessage; }
+
+        int getErrorCode() {return code;}
+
+    private:
+        int code, line;
+        const char* message, *file;
+        char* fullmessage;
     };
 
     /**
      * @brief Throw an exception
      */
-#define EXCEPTION(code, message)					\
+#define EXCEPTION(code, message)                                        \
     {std::stringstream __msg;__msg << message; throw gourou::Exception(code, __msg.str().c_str(), __FILE__, __LINE__);}
 
     /**
@@ -197,15 +197,15 @@ namespace gourou
     class StringXMLWriter : public pugi::xml_writer
     {
     public:
-	virtual void write(const void* data, size_t size)
-	{
-	    result.append(static_cast<const char*>(data), size);
-	}
+        virtual void write(const void* data, size_t size)
+        {
+            result.append(static_cast<const char*>(data), size);
+        }
 
-	const std::string& getResult() {return result;}
+        const std::string& getResult() {return result;}
 
     private:
-	std::string result;
+        std::string result;
     };
 
     static const char* ws = " \t\n\r\f\v";
@@ -215,8 +215,8 @@ namespace gourou
      */
     inline std::string& rtrim(std::string& s, const char* t = ws)
     {
-	s.erase(s.find_last_not_of(t) + 1);
-	return s;
+        s.erase(s.find_last_not_of(t) + 1);
+        return s;
     }
 
     /**
@@ -224,8 +224,8 @@ namespace gourou
      */
     inline std::string& ltrim(std::string& s, const char* t = ws)
     {
-	s.erase(0, s.find_first_not_of(t));
-	return s;
+        s.erase(0, s.find_first_not_of(t));
+        return s;
     }
 
     /**
@@ -233,7 +233,7 @@ namespace gourou
      */
     inline std::string& trim(std::string& s, const char* t = ws)
     {
-	return ltrim(rtrim(s, t), t);
+        return ltrim(rtrim(s, t), t);
     }
 
     static inline pugi::xml_node getNode(const pugi::xml_node& root, const char* tagName, bool throwOnNull=true)
@@ -241,17 +241,17 @@ namespace gourou
         pugi::xpath_node xpath_node = root.select_node(tagName);
 
         if (!xpath_node)
-	{
-	    if (throwOnNull)
-		EXCEPTION(GOUROU_TAG_NOT_FOUND, "Tag " << tagName << " not found");
-	    
-            return pugi::xml_node();
-	}
+        {
+            if (throwOnNull)
+                EXCEPTION(GOUROU_TAG_NOT_FOUND, "Tag " << tagName << " not found");
 
-	return xpath_node.node();
+            return pugi::xml_node();
+        }
+
+        return xpath_node.node();
 
     }
-    
+
     /**
      * @brief Extract text node from tag in document
      * It can throw an exception if tag does not exists
@@ -259,19 +259,19 @@ namespace gourou
      */
     static inline std::string extractTextElem(const pugi::xml_node& root, const char* tagName, bool throwOnNull=true)
     {
-	pugi::xml_node node = getNode(root, tagName, throwOnNull);
+        pugi::xml_node node = getNode(root, tagName, throwOnNull);
 
-	node = node.first_child();
+        node = node.first_child();
 
-	if (!node)
-	{
-	    if (throwOnNull)
-		EXCEPTION(GOUROU_TAG_NOT_FOUND, "Text element for tag " << tagName << " not found");
-	    
+        if (!node)
+        {
+            if (throwOnNull)
+                EXCEPTION(GOUROU_TAG_NOT_FOUND, "Text element for tag " << tagName << " not found");
+
             return "";
-	}
+        }
 
-	std::string res = node.value();
+        std::string res = node.value();
         return trim(res);
     }
 
@@ -280,23 +280,23 @@ namespace gourou
      * It can throw an exception if tag does not exists
      */
     static inline void setTextElem(const pugi::xml_node& root, const char* tagName,
-				   const std::string& value, bool throwOnNull=true)
+                                   const std::string& value, bool throwOnNull=true)
     {
-	pugi::xml_node node = getNode(root, tagName, throwOnNull);
+        pugi::xml_node node = getNode(root, tagName, throwOnNull);
 
-	if (!node)
-	{
-	    if (throwOnNull)
-		EXCEPTION(GOUROU_TAG_NOT_FOUND, "Text element for tag " << tagName << " not found");
+        if (!node)
+        {
+            if (throwOnNull)
+                EXCEPTION(GOUROU_TAG_NOT_FOUND, "Text element for tag " << tagName << " not found");
             return;
-	}
+        }
 
-	node = node.first_child();
+        node = node.first_child();
 
-	if (!node)
-	    node.append_child(pugi::node_pcdata).set_value(value.c_str());
-	else
-	    node.set_value(value.c_str());
+        if (!node)
+            node.append_child(pugi::node_pcdata).set_value(value.c_str());
+        else
+            node.set_value(value.c_str());
     }
 
     /**
@@ -306,20 +306,20 @@ namespace gourou
      */
     static inline std::string extractTextAttribute(const pugi::xml_node& root, const char* tagName, const char* attributeName, bool throwOnNull=true)
     {
-	pugi::xml_node node = getNode(root, tagName, throwOnNull);
+        pugi::xml_node node = getNode(root, tagName, throwOnNull);
 
-	pugi::xml_attribute attr = node.attribute(attributeName);
+        pugi::xml_attribute attr = node.attribute(attributeName);
 
-	if (!attr)
-	{
-	    if (throwOnNull)
-		EXCEPTION(GOUROU_TAG_NOT_FOUND, "Attribute element " << attributeName << " for tag " << tagName << " not found");
-	    
+        if (!attr)
+        {
+            if (throwOnNull)
+                EXCEPTION(GOUROU_TAG_NOT_FOUND, "Attribute element " << attributeName << " for tag " << tagName << " not found");
+
             return "";
-	}
+        }
 
-	std::string res = attr.value();
-	return trim(res);
+        std::string res = attr.value();
+        return trim(res);
     }
 
     /**
@@ -331,8 +331,8 @@ namespace gourou
      */
     static inline void appendTextElem(pugi::xml_node& root, const std::string& name, const std::string& value)
     {
-	pugi::xml_node node = root.append_child(name.c_str());
-	node.append_child(pugi::node_pcdata).set_value(value.c_str());
+        pugi::xml_node node = root.append_child(name.c_str());
+        node.append_child(pugi::node_pcdata).set_value(value.c_str());
     }
 
     /**
@@ -343,21 +343,21 @@ namespace gourou
      */
     static inline std::string extractIdFromUUID(const std::string& uuid)
     {
-	unsigned int i = 0;
-	std::string res;
-	
-	if (uuid.find("urn:uuid:") == 0)
-	    i = 9;
+        unsigned int i = 0;
+        std::string res;
 
-	for(; i<uuid.size(); i++)
-	{
-	    if (uuid[i] != '-')
-		res += uuid[i];
-	}
+        if (uuid.find("urn:uuid:") == 0)
+            i = 9;
 
-	return res;
+        for(; i<uuid.size(); i++)
+        {
+            if (uuid[i] != '-')
+                res += uuid[i];
+        }
+
+        return res;
     }
-    
+
     /**
      * @brief Open a file descriptor on path. If it already exists and truncate == true, it's truncated
      *
@@ -365,31 +365,31 @@ namespace gourou
      */
     static inline int createNewFile(std::string path, bool truncate=true)
     {
-	int options = O_CREAT|O_WRONLY;
-	if (truncate)
-	    options |= O_TRUNC;
-	else
-	    options |= O_APPEND;
+        int options = O_CREAT|O_WRONLY;
+        if (truncate)
+            options |= O_TRUNC;
+        else
+            options |= O_APPEND;
 
-	int fd = open(path.c_str(), options, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+        int fd = open(path.c_str(), options, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 
-	if (fd <= 0)
-	    EXCEPTION(GOUROU_FILE_ERROR, "Unable to create " << path);
+        if (fd <= 0)
+            EXCEPTION(GOUROU_FILE_ERROR, "Unable to create " << path);
 
-	return fd;
+        return fd;
     }
-    
+
     /**
      * @brief Write data in a file. If it already exists, it's truncated
      */
     static inline void writeFile(std::string path, const unsigned char* data, unsigned int length)
     {
-	int fd = createNewFile(path);
-	
-	if (write(fd, data, length) != length)
-	    EXCEPTION(GOUROU_FILE_ERROR, "Write error for file " << path);
+        int fd = createNewFile(path);
 
-	close (fd);
+        if (write(fd, data, length) != length)
+            EXCEPTION(GOUROU_FILE_ERROR, "Write error for file " << path);
+
+        close (fd);
     }
 
     /**
@@ -397,7 +397,7 @@ namespace gourou
      */
     static inline void writeFile(std::string path, ByteArray& data)
     {
-	writeFile(path, data.data(), data.length());
+        writeFile(path, data.data(), data.length());
     }
 
     /**
@@ -405,7 +405,7 @@ namespace gourou
      */
     static inline void writeFile(std::string path, const std::string& data)
     {
-	writeFile(path, (const unsigned char*)data.c_str(), data.length());
+        writeFile(path, (const unsigned char*)data.c_str(), data.length());
     }
 
     /**
@@ -413,15 +413,15 @@ namespace gourou
      */
     static inline void readFile(std::string path, const unsigned char* data, unsigned int length)
     {
-	int fd = open(path.c_str(), O_RDONLY);
+        int fd = open(path.c_str(), O_RDONLY);
 
-	if (fd <= 0)
-	    EXCEPTION(GOUROU_FILE_ERROR, "Unable to open " << path);
+        if (fd <= 0)
+            EXCEPTION(GOUROU_FILE_ERROR, "Unable to open " << path);
 
-	if (read(fd, (void*)data, length) != length)
-	    EXCEPTION(GOUROU_FILE_ERROR, "Read error for file " << path);
+        if (read(fd, (void*)data, length) != length)
+            EXCEPTION(GOUROU_FILE_ERROR, "Read error for file " << path);
 
-	close (fd);
+        close (fd);
     }
 
 #define PATH_MAX_STRING_SIZE 256
@@ -429,73 +429,73 @@ namespace gourou
     // https://gist.github.com/ChisholmKyle/0cbedcd3e64132243a39
 /* recursive mkdir */
     static inline int mkdir_p(const char *dir, const mode_t mode) {
-	char tmp[PATH_MAX_STRING_SIZE];
-	char *p = NULL;
-	struct stat sb;
-	size_t len;
-    
-	/* copy path */
-	len = strnlen (dir, PATH_MAX_STRING_SIZE);
-	if (len == 0 || len == PATH_MAX_STRING_SIZE) {
-	    return -1;
-	}
-	memcpy (tmp, dir, len);
-	tmp[len] = '\0';
+        char tmp[PATH_MAX_STRING_SIZE];
+        char *p = NULL;
+        struct stat sb;
+        size_t len;
 
-	/* remove trailing slash */
-	if(tmp[len - 1] == '/') {
-	    tmp[len - 1] = '\0';
-	}
+        /* copy path */
+        len = strnlen (dir, PATH_MAX_STRING_SIZE);
+        if (len == 0 || len == PATH_MAX_STRING_SIZE) {
+            return -1;
+        }
+        memcpy (tmp, dir, len);
+        tmp[len] = '\0';
 
-	/* check if path exists and is a directory */
-	if (stat (tmp, &sb) == 0) {
-	    if (S_ISDIR (sb.st_mode)) {
-		return 0;
-	    }
-	}
-    
-	/* recursive mkdir */
-	for(p = tmp + 1; *p; p++) {
-	    if(*p == '/') {
-		*p = 0;
-		/* test path */
-		if (stat(tmp, &sb) != 0) {
-		    /* path does not exist - create directory */
-		    if (mkdir(tmp, mode) < 0) {
-			return -1;
-		    }
-		} else if (!S_ISDIR(sb.st_mode)) {
-		    /* not a directory */
-		    return -1;
-		}
-		*p = '/';
-	    }
-	}
-	/* test path */
-	if (stat(tmp, &sb) != 0) {
-	    /* path does not exist - create directory */
-	    if (mkdir(tmp, mode) < 0) {
-		return -1;
-	    }
-	} else if (!S_ISDIR(sb.st_mode)) {
-	    /* not a directory */
-	    return -1;
-	}
-	return 0;
+        /* remove trailing slash */
+        if(tmp[len - 1] == '/') {
+            tmp[len - 1] = '\0';
+        }
+
+        /* check if path exists and is a directory */
+        if (stat (tmp, &sb) == 0) {
+            if (S_ISDIR (sb.st_mode)) {
+                return 0;
+            }
+        }
+
+        /* recursive mkdir */
+        for(p = tmp + 1; *p; p++) {
+            if(*p == '/') {
+                *p = 0;
+                /* test path */
+                if (stat(tmp, &sb) != 0) {
+                    /* path does not exist - create directory */
+                    if (mkdir(tmp, mode) < 0) {
+                        return -1;
+                    }
+                } else if (!S_ISDIR(sb.st_mode)) {
+                    /* not a directory */
+                    return -1;
+                }
+                *p = '/';
+            }
+        }
+        /* test path */
+        if (stat(tmp, &sb) != 0) {
+            /* path does not exist - create directory */
+            if (mkdir(tmp, mode) < 0) {
+                return -1;
+            }
+        } else if (!S_ISDIR(sb.st_mode)) {
+            /* not a directory */
+            return -1;
+        }
+        return 0;
     }
 
     static inline void dumpBuffer(GOUROU_LOG_LEVEL level, const char* title, const unsigned char* data, unsigned int len)
     {
-	if (gourou::logLevel < level)
-	    return;
-	
-	printf("%s", title);
-	for(unsigned int i=0; i<len; i++)
-	{
-	    if (i && !(i%16)) printf("\n");
-	    printf("%02x ", data[i]);
-	}
-	printf("\n");	
+        if (gourou::logLevel < level)
+            return;
+
+        printf("%s", title);
+        for(unsigned int i=0; i<len; i++)
+        {
+            if (i && !(i%16)) printf("\n");
+            printf("%02x ", data[i]);
+        }
+        printf("\n");
     }
 }
 

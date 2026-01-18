@@ -26,232 +26,232 @@
 namespace gourou
 {
     std::map<unsigned char*, int> ByteArray::refCounter;
-    
+
     ByteArray::ByteArray(bool useMalloc):_useMalloc(useMalloc), _data(0), _length(0)
     {}
 
     ByteArray::ByteArray(unsigned int length, bool useMalloc):
-	_useMalloc(useMalloc)
+        _useMalloc(useMalloc)
     {
-	initData(0, length);
+        initData(0, length);
     }
-    
-    ByteArray::ByteArray(const unsigned char* data, unsigned int length):
-	_useMalloc(false)
-    {
-	initData(data, length);
-    }
-    
-    ByteArray::ByteArray(const char* data, int length):
-	_useMalloc(false)
-    {
-	if (length == -1)
-	    length = strlen(data);
 
-	initData((unsigned char*)data, (unsigned int) length);
-    }
-    
-    ByteArray::ByteArray(const std::string& str):
-	_useMalloc(false)
+    ByteArray::ByteArray(const unsigned char* data, unsigned int length):
+        _useMalloc(false)
     {
-	initData((unsigned char*)str.c_str(), (unsigned int)str.length());
+        initData(data, length);
+    }
+
+    ByteArray::ByteArray(const char* data, int length):
+        _useMalloc(false)
+    {
+        if (length == -1)
+            length = strlen(data);
+
+        initData((unsigned char*)data, (unsigned int) length);
+    }
+
+    ByteArray::ByteArray(const std::string& str):
+        _useMalloc(false)
+    {
+        initData((unsigned char*)str.c_str(), (unsigned int)str.length());
     }
 
     void ByteArray::initData(const unsigned char* data, unsigned int length)
     {
-	if (_useMalloc)
-	    _data = (unsigned char*)malloc(length);
-	else
-	    _data = new unsigned char[length];
+        if (_useMalloc)
+            _data = (unsigned char*)malloc(length);
+        else
+            _data = new unsigned char[length];
 
-	if (data)
-	    memcpy((void*)_data, data, length);
+        if (data)
+            memcpy((void*)_data, data, length);
 
-	_length = length;
+        _length = length;
 
-	addRef();
+        addRef();
     }
-    
+
     ByteArray::ByteArray(const ByteArray& other)
     {
-	this->_useMalloc = other._useMalloc;
-	this->_data = other._data;
-	this->_length = other._length;
+        this->_useMalloc = other._useMalloc;
+        this->_data = other._data;
+        this->_length = other._length;
 
-	addRef();
+        addRef();
     }
 
     ByteArray& ByteArray::operator=(const ByteArray& other)
     {
-	delRef();
-	
-	this->_useMalloc = other._useMalloc;
-	this->_data = other._data;
-	this->_length = other._length;
+        delRef();
 
-	addRef();
-	
-	return *this;
+        this->_useMalloc = other._useMalloc;
+        this->_data = other._data;
+        this->_length = other._length;
+
+        addRef();
+
+        return *this;
     }
-    
+
     ByteArray::~ByteArray()
     {
-	delRef();
+        delRef();
     }
-	
+
     void ByteArray::addRef()
     {
-	if (!_data) return;
+        if (!_data) return;
 
-	if (refCounter.count(_data) == 0)
-	    refCounter[_data] = 1;
-	else
-	    refCounter[_data]++;
+        if (refCounter.count(_data) == 0)
+            refCounter[_data] = 1;
+        else
+            refCounter[_data]++;
     }
-    
+
     void ByteArray::delRef()
     {
-	if (!_data) return;
-	
-	if (refCounter[_data] == 1)
-	{
-	    if (_useMalloc)
-		free(_data);
-	    else
-		delete[] _data;
-	    refCounter.erase(_data);
-	}
-	else
-	    refCounter[_data]--;
+        if (!_data) return;
+
+        if (refCounter[_data] == 1)
+        {
+            if (_useMalloc)
+                free(_data);
+            else
+                delete[] _data;
+            refCounter.erase(_data);
+        }
+        else
+            refCounter[_data]--;
     }
 
     ByteArray ByteArray::fromBase64(const ByteArray& other)
     {
-	std::string b64;
+        std::string b64;
 
-	macaron::Base64::Decode(std::string((char*)other._data, other._length), b64);
+        macaron::Base64::Decode(std::string((char*)other._data, other._length), b64);
 
-	return ByteArray(b64);
+        return ByteArray(b64);
     }
-    
+
     ByteArray ByteArray::fromBase64(const char* data, int length)
     {
-	std::string b64;
+        std::string b64;
 
-	if (length == -1)
-	    length = strlen(data);
-	
-	macaron::Base64::Decode(std::string(data, length), b64);
+        if (length == -1)
+            length = strlen(data);
 
-	return ByteArray(b64);
+        macaron::Base64::Decode(std::string(data, length), b64);
+
+        return ByteArray(b64);
     }
-    
+
     ByteArray ByteArray::fromBase64(const std::string& str)
     {
-	return ByteArray::fromBase64(str.c_str(), str.length());
+        return ByteArray::fromBase64(str.c_str(), str.length());
     }
-    
+
     std::string ByteArray::toBase64()
     {
-	return macaron::Base64::Encode(std::string((char*)_data, _length));
+        return macaron::Base64::Encode(std::string((char*)_data, _length));
     }
 
     ByteArray ByteArray::fromHex(const std::string& str)
     {
-	if (str.size() % 2)
-	    throw std::invalid_argument("Size of hex string not multiple of 2");
+        if (str.size() % 2)
+            throw std::invalid_argument("Size of hex string not multiple of 2");
 
-	ByteArray res((unsigned int)(str.size()/2));
-	unsigned int i;
+        ByteArray res((unsigned int)(str.size()/2));
+        unsigned int i;
 
-	unsigned char* data = res.data();
-	unsigned char cur, tmp;
-	
-	for (i=0; i<str.size(); i+=2)
-	{
-	    cur = 0;
+        unsigned char* data = res.data();
+        unsigned char cur, tmp;
 
-	    tmp = str[i];
-	    if (tmp >= 'a' && tmp <= 'f')
-		cur = (tmp - 'a' + 10) << 4;
-	    else if (tmp >= 'A' && tmp <= 'F')
-		cur = (tmp - 'A' + 10) << 4;
-	    else if (tmp >= '0' && tmp <= '9')
-		cur = (tmp - '0') << 4;
-	    else
-		throw std::invalid_argument("Invalid character in hex string");
+        for (i=0; i<str.size(); i+=2)
+        {
+            cur = 0;
 
-	    tmp = str[i+1];
-	    if (tmp >= 'a' && tmp <= 'f')
-		cur += tmp - 'a' + 10;
-	    else if (tmp >= 'A' && tmp <= 'F')
-		cur += tmp - 'A' + 10;
-	    else if (tmp >= '0' && tmp <= '9')
-		cur += tmp - '0';
-	    else
-		throw std::invalid_argument("Invalid character in hex string");
+            tmp = str[i];
+            if (tmp >= 'a' && tmp <= 'f')
+                cur = (tmp - 'a' + 10) << 4;
+            else if (tmp >= 'A' && tmp <= 'F')
+                cur = (tmp - 'A' + 10) << 4;
+            else if (tmp >= '0' && tmp <= '9')
+                cur = (tmp - '0') << 4;
+            else
+                throw std::invalid_argument("Invalid character in hex string");
 
-	    data[i/2] = cur;
-	}
-	
-	return res;
+            tmp = str[i+1];
+            if (tmp >= 'a' && tmp <= 'f')
+                cur += tmp - 'a' + 10;
+            else if (tmp >= 'A' && tmp <= 'F')
+                cur += tmp - 'A' + 10;
+            else if (tmp >= '0' && tmp <= '9')
+                cur += tmp - '0';
+            else
+                throw std::invalid_argument("Invalid character in hex string");
+
+            data[i/2] = cur;
+        }
+
+        return res;
     }
-    
+
     std::string ByteArray::toHex()
     {
-	char* tmp = new char[_length*2+1];
+        char* tmp = new char[_length*2+1];
 
-	for(int i=0; i<(int)_length; i++)
-	    sprintf(&tmp[i*2], "%02x", _data[i]);
+        for(int i=0; i<(int)_length; i++)
+            sprintf(&tmp[i*2], "%02x", _data[i]);
 
-	tmp[_length*2] = 0;
+        tmp[_length*2] = 0;
 
-	std::string res = tmp;
-	delete[] tmp;
-	
-	return res;
+        std::string res = tmp;
+        delete[] tmp;
+
+        return res;
     }
 
     void ByteArray::append(const unsigned char* data, unsigned int length)
     {
-	if (!length)
-	    return;
-	
-	unsigned int oldLength = _length;
+        if (!length)
+            return;
 
-	resize(_length+length, true);
+        unsigned int oldLength = _length;
 
-	memcpy(&_data[oldLength], data, length);	
+        resize(_length+length, true);
+
+        memcpy(&_data[oldLength], data, length);
     }
-    
+
     void ByteArray::append(unsigned char c) { append(&c, 1);}
     void ByteArray::append(const char* str) { append((const unsigned char*)str, strlen(str));}
     void ByteArray::append(const std::string& str) { append((const unsigned char*)str.c_str(), str.length()); }
 
     void ByteArray::resize(unsigned length, bool keepData)
     {
-	if (length == _length)
-	    return;
-	else if (length < _length)
-	    _length = length ; // Don't touch data
-	else // New size >
-	{
-	    unsigned char* newData;
+        if (length == _length)
+            return;
+        else if (length < _length)
+            _length = length ; // Don't touch data
+        else // New size >
+        {
+            unsigned char* newData;
 
-	    if (_useMalloc)
-		newData = (unsigned char*)malloc(_length+length);
-	    else
-		newData = new unsigned char[_length+length];
+            if (_useMalloc)
+                newData = (unsigned char*)malloc(_length+length);
+            else
+                newData = new unsigned char[_length+length];
 
-	    if (keepData)
-		memcpy(newData, _data, _length);
-	
-	    delRef();
+            if (keepData)
+                memcpy(newData, _data, _length);
 
-	    _length = length;
-	    _data = newData;
-	
-	    addRef();
-	}
+            delRef();
+
+            _length = length;
+            _data = newData;
+
+            addRef();
+        }
     }
 }
