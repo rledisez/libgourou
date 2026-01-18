@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <vector>
+#include <ctime>
 
 #include <uPDFParser.h>
 
@@ -70,6 +71,15 @@ namespace gourou
 	if (user) delete user;
     }
 
+    // function to parse a date or time string.
+    // https://www.geeksforgeeks.org/cpp/date-and-time-parsing-in-cpp/
+    static time_t parseDateTime(const char* datetimeString, const char* format)
+    {
+	struct tm tmStruct;
+	strptime(datetimeString, format, &tmStruct);
+	return mktime(&tmStruct);
+    }
+   
     DRMProcessor* DRMProcessor::createDRMProcessor(DRMProcessorClient* client, bool randomSerial, std::string dirName,
 						   const std::string& hobbes, const std::string& ACSServer)
     {
@@ -488,7 +498,7 @@ namespace gourou
 
 	user->updateActivationFile(activationDoc);
     }
-    
+   
     FulfillmentItem* DRMProcessor::fulfill(const std::string& ACSMFile, bool notify)
     {
 	if (!user->getPKCS12().length())
@@ -508,6 +518,16 @@ namespace gourou
 
 	GOUROU_LOG(INFO, "Fulfill " << ACSMFile);
 
+	std::string expiration = extractTextElem(rootNode, "expiration", false);
+
+	if (expiration != "")
+	{
+	    time_t expirationTime = parseDateTime(expiration.c_str(), "%Y-%m-%dT%H:%M:%S");
+
+	    if (time(NULL) > expirationTime)
+		GOUROU_LOG(WARN, "WARNING: ACSM file expired (" << expiration << "). It may not work");
+	}
+	
 	// Build req file
 	pugi::xml_document fulfillReq;
 
@@ -569,7 +589,7 @@ namespace gourou
 	pugi::xml_document fulfillReply;
 
 	fulfillReply.load_string((const char*)replyData.data());
-
+    
 	std::string licenseURL = extractTextElem(fulfillReply, "//licenseToken/licenseURL");
 	
 	fetchLicenseServiceCertificate(licenseURL, operatorURL);
