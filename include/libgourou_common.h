@@ -181,7 +181,7 @@ namespace gourou
 
     private:
         int code, line;
-        const char* message, *file;
+        const char* file;
         char* fullmessage;
     };
 
