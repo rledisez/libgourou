@@ -12,6 +12,8 @@ LDFLAGS = -lpugixml
 
 VERSION     := $(shell cat include/libgourou.h |grep LIBGOUROU_VERSION|cut -d '"' -f2)
 
+UNAME := $(shell uname -s)
+
 BUILD_STATIC ?= 0
 BUILD_SHARED ?= 1
 BUILD_UTILS  ?= 1
@@ -27,8 +29,13 @@ ifneq ($(BUILD_STATIC), 0)
   STATIC_UTILS=1
 endif
 ifneq ($(BUILD_SHARED), 0)
-  TARGETS += libgourou.so
-  TARGET_LIBRARIES += libgourou.so libgourou.so.$(VERSION)
+  ifeq ($(UNAME), Darwin)
+	TARGETS += libgourou.dylib
+	TARGET_LIBRARIES += libgourou.dylib libgourou.dylib.$(VERSION)
+  else
+	TARGETS += libgourou.so
+	TARGET_LIBRARIES += libgourou.so libgourou.so.$(VERSION)
+  endif
 endif
 ifneq ($(BUILD_UTILS), 0)
   TARGETS += build_utils
@@ -80,6 +87,12 @@ libgourou.so.$(VERSION): $(OBJECTS) $(UPDFPARSERLIB)
 	$(CXX) $^ -Wl,-soname,$@ $(LDFLAGS) -o $@ -shared
 
 libgourou.so: libgourou.so.$(VERSION)
+	ln -f -s $^ $@
+
+libgourou.dylib.$(VERSION): $(OBJECTS) $(UPDFPARSERLIB)
+	$(CXX) $^ $(LDFLAGS) -o $@ -shared
+
+libgourou.dylib: libgourou.dylib.$(VERSION)
 	ln -f -s $^ $@
 
 build_utils: $(TARGET_LIBRARIES)
