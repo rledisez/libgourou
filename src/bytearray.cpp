@@ -202,7 +202,7 @@ namespace gourou
         char* tmp = new char[_length*2+1];
 
         for(int i=0; i<(int)_length; i++)
-            sprintf(&tmp[i*2], "%02x", _data[i]);
+            snprintf(&tmp[i*2], (_length-i)*2+1, "%02x", _data[i]);
 
         tmp[_length*2] = 0;
 
