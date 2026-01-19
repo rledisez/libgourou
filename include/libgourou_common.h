@@ -165,8 +165,8 @@ namespace gourou
         Exception(const Exception& other)
         {
             this->code = other.code;
-            this->line = line;
-            this->file = file;
+            this->line = other.line;
+            this->file = other.file;
             this->fullmessage = strdup(other.fullmessage);
         }
 
