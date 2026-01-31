@@ -1342,7 +1342,7 @@ namespace gourou
 
         uPDFParser::Integer* ebxVersion;
         std::vector<uPDFParser::Object*> objects = parser.objects();
-        std::vector<uPDFParser::Object*>::iterator it;
+        std::vector<uPDFParser::Object*>::iterator it, ebxIt;
         std::vector<uPDFParser::Object*>::reverse_iterator rIt;
         std::vector<uPDFParser::Object*> ebxObjects;
         unsigned char decryptedKey[16];
@@ -1513,10 +1513,34 @@ namespace gourou
             }
         }
 
+        /* Delete objects that reference EBX objects, except in trailer  */
+        for(it = objects.begin(); it != objects.end(); it++)
+        {
+            uPDFParser::Object* object = *it;
+
+            if (object->hasKey("Encrypt") && (*object)["Encrypt"]->type() == uPDFParser::DataType::REFERENCE)
+            {
+                uPDFParser::Reference* encrypt = (uPDFParser::Reference*)(*object)["Encrypt"];
+                
+                /* Delete EBX objects */
+                for(ebxIt = ebxObjects.begin(); ebxIt != ebxObjects.end(); ebxIt++)
+                {
+                    if (encrypt->value() == (*ebxIt)->objectId())
+                    {
+                        GOUROU_LOG(ERROR, "Delete stream id " << object->objectId());
+                        
+                        parser.removeObject(object);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        /* Delete EBX objects */
         for(it = ebxObjects.begin(); it != ebxObjects.end(); it++)
             parser.removeObject(*it);
 
-        uPDFParser::Object& trailer = parser.getTrailer();
+        uPDFParser::Object& trailer = parser.getTrailer();        
         trailer.deleteKey("Encrypt");
 
         parser.write(filenameOut);
