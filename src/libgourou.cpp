@@ -525,7 +525,7 @@ namespace gourou
             time_t expirationTime = parseDateTime(expiration.c_str(), "%Y-%m-%dT%H:%M:%S");
 
             if (time(NULL) > expirationTime)
-                GOUROU_LOG(WARN, "WARNING: ACSM file expired (" << expiration << "). It may not work");
+                GOUROU_LOG(WARN, "WARNING: ACSM file expired (" << expiration << "), It may not work.");
         }
 
         // Build req file

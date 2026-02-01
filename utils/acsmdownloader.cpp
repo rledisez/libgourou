@@ -64,19 +64,18 @@ public:
             if (exportPrivateKey)
             {
                 std::string filename;
-                if (!outputFile)
-                    filename = std::string("Adobe_PrivateLicenseKey--") + user->getUsername() + ".der";
-                else
+                if (outputFile)
                     filename = outputFile;
-    
-                if (outputDir)
+                else
                 {
-                    if (!fileExists(outputDir))
-                        mkpath(outputDir);
-        
-                    filename = std::string(outputDir) + "/" + filename;
+                    filename = std::string("Adobe_PrivateLicenseKey--") + user->getUsername() + ".der";
+
+                    if (outputDir)
+                        filename = std::string(outputDir) + "/" + filename;
                 }
 
+                createPath(filename.c_str());
+                
                 processor.exportPrivateLicenseKey(filename);
 
                 std::cout << "Private license key exported to " << filename << std::endl;
@@ -86,7 +85,9 @@ public:
                 gourou::FulfillmentItem* item = processor.fulfill(acsmFile, notify);
 
                 std::string filename;
-                if (!outputFile)
+                if (outputFile)
+                    filename = outputFile;
+                else
                 {
                     filename = item->getMetadata("title");
                     if (filename == "")
@@ -96,18 +97,13 @@ public:
                         // Remove invalid characters
                         std::replace(filename.begin(), filename.end(), '/', '_');
                     }
-                }
-                else
-                    filename = outputFile;
-    
-                if (outputDir)
-                {
-                    if (!fileExists(outputDir))
-                        mkpath(outputDir);
 
-                    filename = std::string(outputDir) + "/" + filename;
+                    if (outputDir)
+                        filename = std::string(outputDir) + "/" + filename;
                 }
     
+                createPath(filename.c_str());
+
                 gourou::DRMProcessor::ITEM_TYPE type = processor.download(item, filename, resume);
 
                 if (!outputFile)
@@ -186,8 +182,8 @@ static void usage(const char* cmd)
     std::cout << basename((char*)cmd) << " download EPUB file from ACSM request file" << std::endl << std::endl;
     std::cout << "Usage: " << basename((char*)cmd) << " [OPTIONS] file.acsm" << std::endl << std::endl;
     std::cout << "Global Options:" << std::endl;
-    std::cout << "  " << "-O|--output-dir"      << "\t"   << "Optional output directory were to put result (default ./)" << std::endl;
-    std::cout << "  " << "-o|--output-file"     << "\t"   << "Optional output filename (default <title.(epub|pdf|der)>)" << std::endl;
+    std::cout << "  " << "-O|--output-dir"      << "\t"   << "Optional output directory were to put result (default ./) (not compatible with -o)" << std::endl;
+    std::cout << "  " << "-o|--output-file"     << "\t"   << "Optional output filename (default <title.(epub|pdf|der)>) (not compatible with -O)" << std::endl;
     std::cout << "  " << "-f|--acsm-file"       << "\t"   << "Backward compatibility: ACSM request file for epub download" << std::endl;
     std::cout << "  " << "-e|--export-private-key"<< "\t" << "Export private key in DER format" << std::endl;
     std::cout << "  " << "-r|--resume"          << "\t\t" << "Try to resume download (in case of previous failure)" << std::endl;
@@ -309,6 +305,12 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    if (outputDir && outputFile)
+    {
+        std::cout << "Error : you cannot use both -o and -O" << std::endl;
+        return -1;
+    }
+
     ACSMDownloader downloader;
 
     int i;
@@ -339,7 +341,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        if (!fileExists(acsmFile))
+        if (!pathExists(acsmFile))
         {
             std::cout << "Error : " << acsmFile << " doesn't exists" << std::endl;
             ret = -1;

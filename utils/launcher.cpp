@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 
     fullPath = std::string(mountPoint) + util;
 
-    if (std::string(util) == "launcher" || !fileExists(fullPath.c_str()))
+    if (std::string(util) == "launcher" || !pathExists(fullPath.c_str()))
         fullPath = std::string(mountPoint) + DEFAULT_UTIL;
 
     free(argv0);

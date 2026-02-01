@@ -81,19 +81,16 @@ public:
             gourou::DRMProcessor processor(&client, deviceFile, activationFile, devicekeyFile);
     
             std::string filename;
-            if (!outputFile)
-                filename = std::string(inputFile);
-            else
+            if (outputFile)
                 filename = outputFile;
-    
-            if (outputDir)
+            else
             {
-                if (!fileExists(outputDir))
-                    mkpath(outputDir);
+                filename = std::string(inputFile);
 
-                filename = std::string(outputDir) + "/" + filename;
+                if (outputDir)
+                    filename = std::string(outputDir) + "/" + filename;
             }
-
+            
             if (endsWith(filename, ".epub"))
                 type = gourou::DRMProcessor::ITEM_TYPE::EPUB;
             else if (endsWith(filename, ".pdf"))
@@ -102,7 +99,9 @@ public:
             {
                 EXCEPTION(gourou::DRM_FORMAT_NOT_SUPPORTED, "Unsupported file format of " << filename);
             }
-    
+
+            createPath(filename.c_str());
+
             if (inputFile != filename)
             {
                 unlink(filename.c_str());
@@ -147,8 +146,8 @@ static void usage(const char* cmd)
     std::cout << "Usage: " << basename((char*)cmd) << " [OPTIONS] file(.epub|pdf)" << std::endl << std::endl;
 
     std::cout << "Global Options:" << std::endl;
-    std::cout << "  " << "-O|--output-dir"      << "\t"   << "Optional output directory were to put result (default ./)" << std::endl;
-    std::cout << "  " << "-o|--output-file"     << "\t"   << "Optional output filename (default inplace DRM removal>)" << std::endl;
+    std::cout << "  " << "-O|--output-dir"      << "\t"   << "Optional output directory were to put result (default ./) (not compatible with -o)" << std::endl;
+    std::cout << "  " << "-o|--output-file"     << "\t"   << "Optional output filename (default inplace DRM removal>) (not compatible with -O)" << std::endl;
     std::cout << "  " << "-f|--input-file"      << "\t"   << "Backward compatibility: EPUB/PDF file to process" << std::endl;
     std::cout << "  " << "-v|--verbose"         << "\t\t" << "Increase verbosity, can be set multiple times" << std::endl;
     std::cout << "  " << "-V|--version"         << "\t\t" << "Display libgourou version" << std::endl;
@@ -259,6 +258,12 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    if (outputDir && outputFile)
+    {
+        std::cout << "Error : you cannot use both -o and -O" << std::endl;
+        return -1;
+    }
+    
     ADEPTRemove remover;
 
     int i;

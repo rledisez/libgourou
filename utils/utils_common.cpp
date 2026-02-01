@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <libgen.h>
 
 #include <iostream>
 
@@ -51,10 +52,10 @@ void version(void)
     std::cout << "Current libgourou version : " << gourou::DRMProcessor::VERSION << std::endl ;
 }
 
-bool fileExists(const char* filename)
+bool pathExists(const char* path)
 {
     struct stat _stat;
-    int ret = stat(filename, &_stat);
+    int ret = stat(path, &_stat);
 
     return (ret == 0);
 }
@@ -67,15 +68,15 @@ const char* findFile(const char* filename, bool inDefaultDirs)
     if (adeptDir && adeptDir[0])
     {
         path = adeptDir + std::string("/") + filename;
-        if (fileExists(path.c_str()))
+        if (pathExists(path.c_str()))
             return strdup(path.c_str());
     }
 
     path = gourou::DRMProcessor::getDefaultAdeptDir() + filename;
-    if (fileExists(path.c_str()))
+    if (pathExists(path.c_str()))
         return strdup(path.c_str());
 
-    if (fileExists(filename))
+    if (pathExists(filename))
         return strdup(filename);
 
     if (!inDefaultDirs) return 0;
@@ -83,7 +84,7 @@ const char* findFile(const char* filename, bool inDefaultDirs)
     for (int i=0; i<(int)ARRAY_SIZE(defaultDirs); i++)
     {
         path = std::string(defaultDirs[i]) + filename;
-        if (fileExists(path.c_str()))
+        if (pathExists(path.c_str()))
             return strdup(path.c_str());
     }
 
@@ -151,4 +152,13 @@ void fileCopy(const char* in, const char* out)
 
     close (fdIn);
     close (fdOut);
+}
+
+void createPath(const char* filename)
+{
+    char* basepath = strdup(filename);
+    char* outputDir = dirname(basepath);
+    if (outputDir && !pathExists(outputDir))
+        mkpath(outputDir);
+    free(basepath);
 }

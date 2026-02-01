@@ -50,9 +50,9 @@ void version(void);
 const char* findFile(const char* filename, bool inDefaultDirs=true);
 
 /**
- * @brief Does the file (or directory exists)
+ * @brief Does the file (or directory) exists
  */
-bool fileExists(const char* filename);
+bool pathExists(const char* path);
 
 /**
  * @brief Recursively created dir
@@ -63,5 +63,10 @@ void mkpath(const char *dir);
  * @brief Copy file in into file out
  */
 void fileCopy(const char* in, const char* out);
+
+/**
+ * @brief Create intermediate directories if it does not exists
+ */
+void createPath(const char* filename);
 
 #endif

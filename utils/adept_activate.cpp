@@ -240,7 +240,7 @@ int main(int argc, char** argv)
         if (_outputDir[0] == '.' || _outputDir[0] != '/')
         {
             // realpath doesn't works if file/dir doesn't exists
-            if (fileExists(_outputDir))
+            if (pathExists(_outputDir))
                 outputDir = strdup(realpath(_outputDir, 0));
             else
                 outputDir = strdup(abspath(_outputDir));
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
     }
 
     std::string pass;
-    if (fileExists(outputDir))
+    if (pathExists(outputDir))
     {
         int key;
     

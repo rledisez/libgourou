@@ -109,7 +109,7 @@ private:
     
         std::string loanDir = std::string(adeptDir) + std::string("/") + LOANS_DIR;
 
-        if (!fileExists(loanDir.c_str()))
+        if (!pathExists(loanDir.c_str()))
             return;
     
         dp = opendir (loanDir.c_str());
