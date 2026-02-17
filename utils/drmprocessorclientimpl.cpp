@@ -147,6 +147,7 @@ void DRMProcessorClientImpl::randBytes(unsigned char* bytesOut, unsigned int len
 #define HTTP_REQ_MAX_RETRY  5
 #define DISPLAY_THRESHOLD   10*1024 // Threshold to display download progression
 static unsigned downloadedBytes;
+static int lastPercent = -1;
 
 static int downloadProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
                             curl_off_t ultotal, curl_off_t ulnow)
@@ -158,7 +159,11 @@ static int downloadProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
         if (dltotal)
             percent = (dlnow * 100) / dltotal;
 
-        std::cout << "\rDownload " << percent << "%" << std::flush;
+        if (lastPercent != percent)
+        {
+            std::cout << "\rDownload " << percent << "%" << std::flush;
+            lastPercent = percent;
+        }
     }
 
     return 0;
@@ -279,6 +284,7 @@ std::string DRMProcessorClientImpl::sendHTTPRequest(const std::string& URL, cons
 
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, downloadProgress);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+    lastPercent = -1;
 
     for (int i=0; i<HTTP_REQ_MAX_RETRY; i++)
     {
