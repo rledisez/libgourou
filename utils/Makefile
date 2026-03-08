@@ -6,7 +6,7 @@ TARGETS=$(TARGET_BINARIES) launcher
 
 MAN_PAGES=acsmdownloader adept_activate adept_remove adept_loan_mgt
 
-CXXFLAGS=-Wall -fPIC -I$(ROOT)/include -fdata-sections -ffunction-sections
+CXXFLAGS=-Wall -fPIC -I$(ROOT)/include -fmacro-prefix-map=$(ROOT)/= -fdata-sections -ffunction-sections
 
 STATIC_DEP=
 # LDFLAGS += -Wl,--gc-sections
