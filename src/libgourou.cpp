@@ -1513,7 +1513,8 @@ namespace gourou
             }
         }
 
-        /* Delete objects that reference EBX objects, except in trailer  */
+        /* Delete objects that reference EBX objects,
+           except in trailer and objects that references Info */
         for(it = objects.begin(); it != objects.end(); it++)
         {
             uPDFParser::Object* object = *it;
@@ -1522,12 +1523,18 @@ namespace gourou
             {
                 uPDFParser::Reference* encrypt = (uPDFParser::Reference*)(*object)["Encrypt"];
                 
+                if (object->hasKey("Info"))
+                {
+                    object->deleteKey("Encrypt");
+                    continue;
+                }
+                
                 /* Delete EBX objects */
                 for(ebxIt = ebxObjects.begin(); ebxIt != ebxObjects.end(); ebxIt++)
                 {
                     if (encrypt->value() == (*ebxIt)->objectId())
                     {
-                        GOUROU_LOG(ERROR, "Delete stream id " << object->objectId());
+                        GOUROU_LOG(DEBUG, "Delete stream id " << object->objectId());
                         
                         parser.removeObject(object);
                         break;
@@ -1540,7 +1547,7 @@ namespace gourou
         for(it = ebxObjects.begin(); it != ebxObjects.end(); it++)
             parser.removeObject(*it);
 
-        uPDFParser::Object& trailer = parser.getTrailer();        
+        uPDFParser::Object& trailer = parser.getTrailer();
         trailer.deleteKey("Encrypt");
 
         parser.write(filenameOut);
