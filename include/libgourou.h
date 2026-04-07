@@ -34,7 +34,7 @@
 #endif
 
 #ifndef ACS_SERVER
-#define ACS_SERVER              "http://adeactivate.adobe.com/adept"
+#define ACS_SERVER              "https://adeactivate.adobe.com/adept"
 #endif
 
 #define LIBGOUROU_VERSION       "0.8.8"
