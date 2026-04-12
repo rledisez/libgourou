@@ -355,7 +355,7 @@ static void usage(const char* cmd)
     std::cout << "  " << "-l|--list"            << "\t\t" << "List all loaned books" << std::endl;
     std::cout << "  " << "-r|--return"          << "\t\t" << "Return a loaned book" << std::endl;
     std::cout << "  " << "-d|--delete"          << "\t\t" << "Delete a loan entry without returning it" << std::endl;
-    std::cout << "  " << "-N|--no-notify"       << "\t\t" << "Don't notify server, even if requested" << std::endl;
+    std::cout << "  " << "-N|--no-notify"       << "\t" << "Don't notify server, even if requested" << std::endl;
     std::cout << "  " << "-v|--verbose"         << "\t\t" << "Increase verbosity, can be set multiple times" << std::endl;
     std::cout << "  " << "-V|--version"         << "\t\t" << "Display libgourou version" << std::endl;
     std::cout << "  " << "-h|--help"            << "\t\t" << "This help" << std::endl;
@@ -396,7 +396,7 @@ int main(int argc, char** argv)
             {0,                  0,                 0,  0 }
         };
 
-        c = getopt_long(argc, argv, "d:lr:D:vVh",
+        c = getopt_long(argc, argv, "d:lr:D:NvVh",
                         long_options, &option_index);
         if (c == -1)
             break;
