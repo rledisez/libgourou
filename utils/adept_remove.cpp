@@ -88,7 +88,11 @@ public:
                 filename = std::string(inputFile);
 
                 if (outputDir)
-                    filename = std::string(outputDir) + "/" + filename;
+                {
+                    char* basepath = strdup(inputFile);
+                    filename = std::string(outputDir) + "/" + basename(basepath);
+                    free(basepath);
+                }
             }
             
             if (endsWith(filename, ".epub"))
