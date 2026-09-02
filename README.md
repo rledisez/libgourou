@@ -86,6 +86,8 @@ other variables are DESTDIR and PREFIX to handle destination install directory
 Utils
 -----
 
+!!Warning!! : When activating a new device (with _adept\_activate_), Adobe ID accounts are deprecated. You need to sign in with a (dts) ByteBooks account.
+
 First, add libgourou.so to your LD_LIBRARY_PATH
 
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD
