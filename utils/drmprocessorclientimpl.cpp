@@ -261,6 +261,9 @@ std::string DRMProcessorClientImpl::sendHTTPRequest(const std::string& URL, cons
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_COOKIEJAR, cookiejar);
 
+    if (getenv("SSL_CERT_FILE") != NULL)
+	curl_easy_setopt(curl, CURLOPT_CAINFO, getenv("SSL_CERT_FILE"));
+
     if (POSTData.size())
     {
         curl_easy_setopt(curl, CURLOPT_POST, 1L);
