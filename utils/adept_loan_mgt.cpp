@@ -31,7 +31,6 @@
 #include <iostream>
 #include <algorithm>
 
-#define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
