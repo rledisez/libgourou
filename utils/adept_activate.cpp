@@ -32,6 +32,7 @@
 #include <string.h>
 #include <limits.h>
 #include <libgen.h>
+#include <cstdio>
 
 #include <iostream>
 #include <ostream>
@@ -259,14 +260,22 @@ int main(int argc, char** argv)
             std::cout << "!! Warning !! : " << outputDir << " already exists." << std::endl;
             std::cout << "All your data will be overwrite. Would you like to continue ? [y/N] " << std::flush ;
             key = getchar();
+            if (key == EOF)
+            {
+                std::cout << std::endl;
+                std::cerr << "No answer on stdin, aborting." << std::endl;
+                ret = 1;
+                goto end;
+            }
             if (key == 'n' || key == 'N' || key == '\n' || key == '\r')
                 goto end;
             if (key == 'y' || key == 'Y')
                 break;
         }
 
-        // Clean STDIN buf
-        while ((key = getchar()) != '\n')
+        // Consume the rest of the answer line, but stop at EOF: with stdin
+        // closed this loop used to spin forever after a "y" answer.
+        while ((key = getchar()) != '\n' && key != EOF)
             ;
     }
 
